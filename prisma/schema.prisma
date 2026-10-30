@@ -1,0 +1,443 @@
+// AutoPro: detailing and car-care workshops.
+// Its own database (see .env.example); schema changes reach production through
+// `prisma db push` in scripts/start.mjs, so keep changes additive.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- business & people
+
+model Business {
+  id               String   @id @default(cuid())
+  name             String
+  phone            String?
+  email            String?
+  address          String?
+  city             String?
+  district         String?
+  latitude         Float?
+  longitude        Float?
+  taxNumber        String?  @map("tax_number")
+  vatRate          Decimal  @default(20) @map("vat_rate") @db.Decimal(5, 2)
+  pricesIncludeVat Boolean  @default(true) @map("prices_include_vat")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  users        User[]
+  customers    Customer[]
+  vehicles     Vehicle[]
+  services     Service[]
+  stations     Station[]
+  segments     SegmentMultiplier[]
+  workOrders   WorkOrder[]
+  appointments Appointment[]
+  expenses     Expense[]
+  reminders    Reminder[]
+  photos       Photo[]
+
+  @@map("businesses")
+}
+
+enum Role {
+  OWNER
+  MANAGER
+  TECHNICIAN // usta
+  VALET
+}
+
+model User {
+  id             String    @id @default(cuid())
+  businessId     String    @map("business_id")
+  name           String
+  email          String    @unique
+  phone          String?
+  passwordHash   String    @map("password_hash")
+  role           Role      @default(TECHNICIAN)
+  // Share of the work they do, for the monthly commission report (e.g. 10.00 = %10)
+  commissionRate Decimal?  @map("commission_rate") @db.Decimal(5, 2)
+  isActive       Boolean   @default(true) @map("is_active")
+  lastLoginAt    DateTime? @map("last_login_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  business       Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  assignedOrders WorkOrder[]     @relation("Technician")
+  itemsDone      WorkOrderItem[] @relation("ItemTechnician")
+
+  @@index([businessId])
+  @@map("users")
+}
+
+// ---------------------------------------------------------------- customers & vehicles
+
+model Customer {
+  id               String   @id @default(cuid())
+  businessId       String   @map("business_id")
+  name             String
+  phone            String // normalised, e.g. 05321112233
+  email            String?
+  address          String?
+  city             String?
+  district         String?
+  latitude         Float?
+  longitude        Float?
+  notes            String?  @db.Text
+  marketingConsent Boolean  @default(false) @map("marketing_consent")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  vehicles     Vehicle[]
+  workOrders   WorkOrder[]
+  appointments Appointment[]
+  reminders    Reminder[]
+
+  @@unique([businessId, phone])
+  @@map("customers")
+}
+
+enum VehicleSegment {
+  HATCHBACK
+  SEDAN
+  SUV
+  SUV_LARGE
+  COMMERCIAL
+  MOTORCYCLE
+}
+
+model Vehicle {
+  id         String         @id @default(cuid())
+  businessId String         @map("business_id")
+  customerId String         @map("customer_id")
+  plate      String         @db.VarChar(16) // normalised, no spaces: "34ABC789" (lib/plate.ts)
+  brand      String?
+  model      String?
+  year       Int?
+  color      String?
+  segment    VehicleSegment @default(SEDAN)
+  notes      String?        @db.Text
+  createdAt  DateTime       @default(now()) @map("created_at")
+
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  workOrders   WorkOrder[]
+  appointments Appointment[]
+  reminders    Reminder[]
+
+  @@unique([businessId, plate])
+  @@map("vehicles")
+}
+
+// Price factor per vehicle class: price = service base price × multiplier
+model SegmentMultiplier {
+  businessId String         @map("business_id")
+  segment    VehicleSegment
+  multiplier Decimal        @db.Decimal(4, 2)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@id([businessId, segment])
+  @@map("segment_multipliers")
+}
+
+// ---------------------------------------------------------------- catalogue & workshop
+
+enum StationType {
+  WASH_BAY // yıkama peronu
+  LIFT
+  DETAILING_ROOM // seramik / PPF odası
+  INTERIOR // iç detay alanı
+}
+
+model Station {
+  id         String      @id @default(cuid())
+  businessId String      @map("business_id")
+  name       String
+  type       StationType
+  isActive   Boolean     @default(true) @map("is_active")
+  sortOrder  Int         @default(0) @map("sort_order")
+
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  workOrders   WorkOrder[]
+  appointments Appointment[]
+
+  @@map("stations")
+}
+
+model Service {
+  id              String       @id @default(cuid())
+  businessId      String       @map("business_id")
+  name            String
+  description     String?
+  basePrice       Decimal      @map("base_price") @db.Decimal(10, 2) // sedan price
+  durationMinutes Int          @default(60) @map("duration_minutes")
+  stationType     StationType? @map("station_type")
+  // Ask the customer back after this many months (ceramic check-up, ozone…); null = never
+  reminderMonths  Int?         @map("reminder_months")
+  isActive        Boolean      @default(true) @map("is_active")
+  sortOrder       Int          @default(0) @map("sort_order")
+
+  business Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  items    WorkOrderItem[]
+
+  @@map("services")
+}
+
+// ---------------------------------------------------------------- work orders
+
+enum WorkStage {
+  RECEIVED // kabul: hasar kaydı alındı
+  WASHING
+  DETAILING
+  QUALITY_CHECK
+  READY // teslime hazır
+  VALET_DELIVERY // vale yolda
+  DELIVERED
+  CANCELLED
+}
+
+model WorkOrder {
+  id            String    @id @default(cuid())
+  businessId    String    @map("business_id")
+  number        String    @unique // AP-261030-4K7Q
+  trackingToken String    @unique @map("tracking_token") @db.VarChar(32)
+  customerId    String    @map("customer_id")
+  vehicleId     String    @map("vehicle_id")
+  stage         WorkStage @default(RECEIVED)
+  stationId     String?   @map("station_id")
+  technicianId  String?   @map("technician_id")
+  mileage       Int?
+  fuelLevel     String?   @map("fuel_level") @db.VarChar(8)
+  promisedAt    DateTime? @map("promised_at")
+  totalAmount   Decimal   @default(0) @map("total_amount") @db.Decimal(10, 2)
+  valetPickup   Boolean   @default(false) @map("valet_pickup")
+  valetDropoff  Boolean   @default(false) @map("valet_dropoff")
+  notes         String?   @db.Text
+  createdById   String?   @map("created_by_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deliveredAt   DateTime? @map("delivered_at")
+
+  business    Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer    Customer         @relation(fields: [customerId], references: [id])
+  vehicle     Vehicle          @relation(fields: [vehicleId], references: [id])
+  station     Station?         @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  technician  User?            @relation("Technician", fields: [technicianId], references: [id], onDelete: SetNull)
+  items       WorkOrderItem[]
+  events      WorkOrderEvent[]
+  payments    Payment[]
+  inspection  Inspection?
+  photos      Photo[]
+  appointment Appointment?
+
+  @@index([businessId, stage])
+  @@index([businessId, createdAt])
+  @@map("work_orders")
+}
+
+model WorkOrderItem {
+  id           String   @id @default(cuid())
+  workOrderId  String   @map("work_order_id")
+  serviceId    String?  @map("service_id")
+  name         String
+  basePrice    Decimal  @map("base_price") @db.Decimal(10, 2)
+  multiplier   Decimal  @default(1) @db.Decimal(4, 2)
+  quantity     Int      @default(1)
+  totalPrice   Decimal  @map("total_price") @db.Decimal(10, 2)
+  technicianId String?  @map("technician_id") // who did it, for commission
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  workOrder  WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  service    Service?  @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  technician User?     @relation("ItemTechnician", fields: [technicianId], references: [id], onDelete: SetNull)
+
+  @@map("work_order_items")
+}
+
+// Stage history: the tracking page timeline and "who moved it when"
+model WorkOrderEvent {
+  id          String    @id @default(cuid())
+  workOrderId String    @map("work_order_id")
+  stage       WorkStage
+  note        String?   @db.Text
+  userId      String?   @map("user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@index([workOrderId])
+  @@map("work_order_events")
+}
+
+// ---------------------------------------------------------------- intake inspection
+
+model Inspection {
+  id                 String    @id @default(cuid())
+  workOrderId        String    @unique @map("work_order_id")
+  createdById        String?   @map("created_by_id")
+  // The customer confirmed the recorded damage (tracking page button or in-shop signature)
+  customerApprovedAt DateTime? @map("customer_approved_at")
+  approvalChannel    String?   @map("approval_channel") @db.VarChar(16) // LINK | SIGNATURE
+  signaturePath      String?   @map("signature_path")
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  workOrder WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  marks     DamageMark[]
+
+  @@map("inspections")
+}
+
+enum DamageKind {
+  SCRATCH
+  DENT
+  STONE_CHIP
+  PAINT
+  RIM
+  GLASS
+  OTHER
+}
+
+model DamageMark {
+  id           String     @id @default(cuid())
+  inspectionId String     @map("inspection_id")
+  number       Int // the number drawn on the diagram
+  part         String     @db.VarChar(40) // lib/vehicle-parts.ts key, e.g. "front_left_door"
+  kind         DamageKind
+  note         String?
+  // Position on the top-view diagram, 0–1 of its width and height
+  x            Float
+  y            Float
+
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  photos     Photo[]
+
+  @@map("damage_marks")
+}
+
+enum PhotoKind {
+  DAMAGE
+  BEFORE
+  AFTER
+}
+
+model Photo {
+  id           String    @id @default(cuid())
+  businessId   String    @map("business_id")
+  workOrderId  String    @map("work_order_id")
+  damageMarkId String?   @map("damage_mark_id")
+  kind         PhotoKind
+  path         String // under PHOTOS_DIR
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  business   Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  workOrder  WorkOrder   @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  damageMark DamageMark? @relation(fields: [damageMarkId], references: [id], onDelete: SetNull)
+
+  @@map("photos")
+}
+
+// ---------------------------------------------------------------- appointments
+
+enum AppointmentStatus {
+  BOOKED
+  ARRIVED // turned into a work order
+  CANCELLED
+  NO_SHOW
+}
+
+model Appointment {
+  id             String            @id @default(cuid())
+  businessId     String            @map("business_id")
+  customerId     String?           @map("customer_id")
+  vehicleId      String?           @map("vehicle_id")
+  stationId      String?           @map("station_id")
+  title          String // "Seramik kaplama · 2 gün"
+  startsAt       DateTime          @map("starts_at")
+  endsAt         DateTime          @map("ends_at")
+  status         AppointmentStatus @default(BOOKED)
+  workOrderId    String?           @unique @map("work_order_id")
+  notes          String?           @db.Text
+  createdAt      DateTime          @default(now()) @map("created_at")
+
+  business  Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer  Customer?  @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  vehicle   Vehicle?   @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  station   Station?   @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  workOrder WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+
+  @@index([businessId, startsAt])
+  @@map("appointments")
+}
+
+// ---------------------------------------------------------------- money
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  workOrderId String        @map("work_order_id")
+  amount      Decimal       @db.Decimal(10, 2)
+  method      PaymentMethod
+  note        String?
+  paidAt      DateTime      @default(now()) @map("paid_at")
+  createdById String?       @map("created_by_id")
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@index([workOrderId])
+  @@map("payments")
+}
+
+model Expense {
+  id          String         @id @default(cuid())
+  businessId  String         @map("business_id")
+  amount      Decimal        @db.Decimal(10, 2)
+  category    String         @db.VarChar(40) // lib/expenses.ts
+  description String?        @db.Text
+  method      PaymentMethod?
+  spentAt     DateTime       @map("spent_at")
+  createdById String?        @map("created_by_id")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, spentAt])
+  @@map("expenses")
+}
+
+// ---------------------------------------------------------------- bring-back reminders
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  DONE
+  DISMISSED
+}
+
+model Reminder {
+  id                String         @id @default(cuid())
+  businessId        String         @map("business_id")
+  customerId        String         @map("customer_id")
+  vehicleId         String         @map("vehicle_id")
+  title             String // "Seramik kaplama 6. ay kontrolü"
+  dueAt             DateTime       @map("due_at")
+  status            ReminderStatus @default(PENDING)
+  sentAt            DateTime?      @map("sent_at")
+  sourceWorkOrderId String?        @map("source_work_order_id")
+  createdAt         DateTime       @default(now()) @map("created_at")
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  vehicle  Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, status, dueAt])
+  @@map("reminders")
+}

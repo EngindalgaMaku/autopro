@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* AutoPro look: graphite ground, one signal-amber accent. Green only means ready / paid and
+   red only late / damage, so colour always carries meaning. The app is dark by design (wet,
+   bright workshop light; premium detailing feel), not a theme toggle. */
+@theme {
+  --color-ground: #111317;
+  --color-surface: #1a1d23;
+  --color-raised: #22262e;
+  --color-sunken: #16191e;
+  --color-line: #2e333c;
+  --color-line-strong: #5b6270;
+  --color-ink: #f3f4f6;
+  --color-muted: #a3aab5;
+  --color-accent: #ffb020;
+  --color-accent-hover: #ffc94d;
+  --color-accent-ink: #1a1300;
+  --color-ready: #34d399;
+  --color-danger: #f87171;
+  --color-plate-blue: #1f4fd8;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-barlow), var(--font-inter), sans-serif;
+  --font-plate: var(--font-barlow-condensed), var(--font-barlow), sans-serif;
+
+  --radius-card: 14px;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--color-ground);
+}
+
+body {
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keyboard focus stays visible on the dark ground */
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px; /* below 16px mobile browsers zoom into the field */
+}
