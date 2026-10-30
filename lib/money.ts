@@ -17,7 +17,8 @@ export function parseTL(input: string): number | null {
 /** ₺1.250 or ₺1.250,50 */
 export function formatTL(value: number | string | { toString(): string }) {
   const n = typeof value === "number" ? value : Number(value.toString());
-  return `₺${n.toLocaleString("tr-TR", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+  const abs = Math.abs(n);
+  return `${n < 0 ? "−" : ""}₺${abs.toLocaleString("tr-TR", { minimumFractionDigits: abs % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
 }
 
 /** The price for a vehicle class, rounded to whole lira (workshops quote round numbers) */
