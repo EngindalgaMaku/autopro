@@ -110,7 +110,7 @@ export const FEATURES = [
   { icon: Car, title: "Plakayla kabul", text: "Araç ve müşteri geçmişi" },
   { icon: Tags, title: "Sınıfa göre fiyat", text: "Hatchback'ten ticariye" },
   { icon: Link2, title: "Takip bağlantısı", text: "Üyeliksiz, WhatsApp'tan" },
-  { icon: BellRing, title: "Bakım hatırlatma", text: "Seramik 6. ay kontrolü" },
+  { icon: BellRing, title: "Bakım hatırlatma", text: "Zamanı gelen müşteriler" },
 ];
 
 export function AuthShowcase() {

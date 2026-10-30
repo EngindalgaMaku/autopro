@@ -190,7 +190,7 @@ function ServiceForm({
       )}
 
       <Field label="Kısa açıklama" hint="Fişte ve müşteri sayfasında görünür">
-        <Input name="description" defaultValue={service?.description} placeholder="Örn. 2 kat · 24 ay koruma" maxLength={160} />
+        <Input name="description" defaultValue={service?.description} placeholder="Örn. 2 kat uygulama" maxLength={160} />
       </Field>
 
       <div className="flex flex-wrap gap-2">

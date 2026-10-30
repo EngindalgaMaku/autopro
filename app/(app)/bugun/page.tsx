@@ -120,7 +120,7 @@ export default async function TodayPage() {
         <Eyebrow>Arayıp hatırlatın</Eyebrow>
         {reminders.length === 0 ? (
           <Card className="p-6 text-center text-sm text-muted">
-            Bu hafta hatırlatılacak bakım yok. Seramik gibi hizmetlerde kontrol zamanı gelince burada görünür.
+            Bu hafta hatırlatılacak bakım yok. Hizmetlerde hatırlatma süresi girdiyseniz, zamanı gelen müşteriler burada görünür.
           </Card>
         ) : (
           <ul className="space-y-2">

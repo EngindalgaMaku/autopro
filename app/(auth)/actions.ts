@@ -14,8 +14,9 @@ export interface FormState {
   fields?: Record<string, string>;
 }
 
-// A new workshop starts with the usual floor plan and service names; prices are left at 0
-// for the owner to set (Bugün shows a reminder until they do)
+// A new workshop starts with the usual floor plan and service names. Prices, warranty terms
+// and reminder intervals are left empty: they depend on the products the shop uses, so the
+// owner sets them (Bugün shows a reminder for missing prices)
 const STARTER_STATIONS: Array<{ name: string; type: StationType }> = [
   { name: "Yıkama peronu", type: "WASH_BAY" },
   { name: "Lift 1", type: "LIFT" },
@@ -33,10 +34,10 @@ const STARTER_SERVICES: Array<{
 }> = [
   { name: "Detaylı iç-dış temizlik", kind: "WASH", durationMinutes: 120, stationType: "WASH_BAY" },
   { name: "Pasta cila", kind: "POLISH", durationMinutes: 360, stationType: "DETAILING_ROOM" },
-  { name: "Seramik kaplama", kind: "CERAMIC", durationMinutes: 960, stationType: "DETAILING_ROOM", reminderMonths: 6, warrantyMonths: 24 },
-  { name: "PPF ön paket", kind: "PPF", durationMinutes: 960, stationType: "DETAILING_ROOM", warrantyMonths: 60 },
-  { name: "Cam filmi", kind: "WINDOW_FILM", durationMinutes: 180, stationType: "DETAILING_ROOM", warrantyMonths: 60 },
-  { name: "Jant seramiği", kind: "WHEEL", durationMinutes: 120, stationType: "DETAILING_ROOM", reminderMonths: 12 },
+  { name: "Seramik kaplama", kind: "CERAMIC", durationMinutes: 960, stationType: "DETAILING_ROOM" },
+  { name: "PPF ön paket", kind: "PPF", durationMinutes: 960, stationType: "DETAILING_ROOM" },
+  { name: "Cam filmi", kind: "WINDOW_FILM", durationMinutes: 180, stationType: "DETAILING_ROOM" },
+  { name: "Jant seramiği", kind: "WHEEL", durationMinutes: 120, stationType: "DETAILING_ROOM" },
   { name: "Koltuk yıkama", kind: "INTERIOR", durationMinutes: 180, stationType: "INTERIOR" },
   { name: "Ozon ile koku giderme", kind: "INTERIOR", durationMinutes: 45, stationType: "INTERIOR" },
   { name: "Motor temizliği", kind: "WASH", durationMinutes: 60, stationType: "WASH_BAY" },
