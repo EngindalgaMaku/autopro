@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { StationType, VehicleSegment } from "@prisma/client";
+import { ServiceKind, StationType, VehicleSegment } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { parseTL } from "@/lib/money";
 import { canManage, requireUser } from "@/lib/session";
@@ -21,6 +21,9 @@ async function manager() {
 const serviceSchema = z.object({
   id: z.string().optional(),
   name: z.string().trim().min(2, "Hizmet adını yazın").max(80),
+  kind: z.nativeEnum(ServiceKind),
+  defaultProduct: z.string().trim().max(80).optional(),
+  warrantyMonths: z.union([z.coerce.number().int().min(1).max(240), z.literal("")]).optional(),
   description: z.string().trim().max(160).optional(),
   basePrice: z.string().transform((v, ctx) => {
     const n = parseTL(v);
@@ -43,6 +46,9 @@ export async function saveService(form: FormData): Promise<ActionResult> {
     const { id, ...d } = parsed.data;
     const data = {
       name: d.name,
+      kind: d.kind,
+      defaultProduct: d.defaultProduct || null,
+      warrantyMonths: d.warrantyMonths === "" || d.warrantyMonths === undefined ? null : d.warrantyMonths,
       description: d.description || null,
       basePrice: d.basePrice,
       durationMinutes: d.durationMinutes,
@@ -119,5 +125,63 @@ export async function saveMultipliers(form: FormData): Promise<ActionResult> {
     return { ok: true };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Kaydedilemedi" };
+  }
+}
+
+const packageSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().trim().min(2, "Paket adını yazın").max(80),
+  price: z.string().transform((v, ctx) => {
+    const n = parseTL(v);
+    if (n === null || n <= 0 || n > 10_000_000) {
+      ctx.addIssue({ code: "custom", message: "Paket fiyatını rakamla yazın" });
+      return z.NEVER;
+    }
+    return n;
+  }),
+  serviceIds: z.array(z.string()).min(2, "Pakete en az iki hizmet seçin"),
+});
+
+export async function savePackage(form: FormData): Promise<ActionResult> {
+  try {
+    const user = await manager();
+    const parsed = packageSchema.safeParse({
+      id: form.get("id") || undefined,
+      name: form.get("name"),
+      price: form.get("price"),
+      serviceIds: form.getAll("serviceIds").map(String),
+    });
+    if (!parsed.success) return { error: parsed.error.issues[0].message };
+    const { id, name, price, serviceIds } = parsed.data;
+    const owned = await prisma.service.count({ where: { businessId: user.businessId, id: { in: serviceIds } } });
+    if (owned !== new Set(serviceIds).size) return { error: "Seçilen hizmetlerden biri bulunamadı" };
+
+    await prisma.$transaction(async (tx) => {
+      let packageId = id;
+      if (id) {
+        const { count } = await tx.servicePackage.updateMany({ where: { id, businessId: user.businessId }, data: { name, price } });
+        if (!count) throw new Error("Paket bulunamadı");
+        await tx.servicePackageItem.deleteMany({ where: { packageId: id } });
+      } else {
+        packageId = (await tx.servicePackage.create({ data: { businessId: user.businessId, name, price } })).id;
+      }
+      await tx.servicePackageItem.createMany({ data: [...new Set(serviceIds)].map((serviceId) => ({ packageId: packageId!, serviceId })) });
+    });
+    revalidatePath("/hizmetler");
+    return { ok: true };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Kaydedilemedi" };
+  }
+}
+
+export async function deletePackage(id: string): Promise<ActionResult> {
+  try {
+    const user = await manager();
+    // Past work orders keep the package name on their items, so a package can always go
+    await prisma.servicePackage.deleteMany({ where: { id, businessId: user.businessId } });
+    revalidatePath("/hizmetler");
+    return { ok: true };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Silinemedi" };
   }
 }

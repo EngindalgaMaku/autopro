@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { Button, Field, Input } from "@/components/ui";
-import { signIn, type FormState } from "../actions";
+import { signIn, type FormState } from "@/app/(auth)/actions";
 
-export default function SignInPage() {
+export function SignInForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(signIn, {});
   return (
     <>

@@ -33,6 +33,7 @@ model Business {
   customers    Customer[]
   vehicles     Vehicle[]
   services     Service[]
+  packages     ServicePackage[]
   stations     Station[]
   segments     SegmentMultiplier[]
   workOrders   WorkOrder[]
@@ -168,10 +169,27 @@ model Station {
   @@map("stations")
 }
 
+// What kind of work a service is: decides which details the intake asks for
+// (lib/service-kinds.ts) and what the customer sees on the tracking page
+enum ServiceKind {
+  WASH // yıkama
+  INTERIOR // iç detay
+  POLISH // pasta cila
+  CERAMIC // seramik kaplama
+  PPF // boya koruma filmi
+  WINDOW_FILM // cam filmi
+  WHEEL // jant
+  OTHER
+}
+
 model Service {
   id              String       @id @default(cuid())
   businessId      String       @map("business_id")
   name            String
+  kind            ServiceKind  @default(OTHER)
+  // Defaults the intake fills in for coatings and films; the item can change them
+  defaultProduct  String?      @map("default_product")
+  warrantyMonths  Int?         @map("warranty_months")
   description     String?
   basePrice       Decimal      @map("base_price") @db.Decimal(10, 2) // sedan price
   durationMinutes Int          @default(60) @map("duration_minutes")
@@ -181,10 +199,39 @@ model Service {
   isActive        Boolean      @default(true) @map("is_active")
   sortOrder       Int          @default(0) @map("sort_order")
 
-  business Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  items    WorkOrderItem[]
+  business     Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  items        WorkOrderItem[]
+  packageItems ServicePackageItem[]
 
   @@map("services")
+}
+
+// Several services sold together at one price (sedan; other classes by multiplier).
+// At intake the package price is spread over its services, so each keeps its own details.
+model ServicePackage {
+  id         String   @id @default(cuid())
+  businessId String   @map("business_id")
+  name       String
+  price      Decimal  @db.Decimal(10, 2)
+  isActive   Boolean  @default(true) @map("is_active")
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  business Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  items    ServicePackageItem[]
+
+  @@map("service_packages")
+}
+
+model ServicePackageItem {
+  packageId String @map("package_id")
+  serviceId String @map("service_id")
+
+  package ServicePackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  service Service        @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([packageId, serviceId])
+  @@map("service_package_items")
 }
 
 // ---------------------------------------------------------------- work orders
@@ -249,6 +296,11 @@ model WorkOrderItem {
   quantity     Int      @default(1)
   totalPrice   Decimal  @map("total_price") @db.Decimal(10, 2)
   technicianId String?  @map("technician_id") // who did it, for commission
+  // Kind-specific record of the work (lib/service-kinds.ts): product and layers for a
+  // coating, zones for PPF, stages for polish, tint and windows for film, warranty months
+  kind         ServiceKind @default(OTHER)
+  details      Json?
+  packageName  String?  @map("package_name")
   createdAt    DateTime @default(now()) @map("created_at")
 
   workOrder  WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)

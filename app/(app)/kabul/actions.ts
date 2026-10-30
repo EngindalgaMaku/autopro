@@ -5,6 +5,7 @@ import { PaymentMethod, Prisma, VehicleSegment } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { newTrackingToken, newWorkOrderNumber } from "@/lib/ids";
 import { segmentPrice } from "@/lib/money";
+import { parseDetails } from "@/lib/service-kinds";
 import { isValidPhone, normalizePhone } from "@/lib/phone";
 import { isValidPlate, normalizePlate } from "@/lib/plate";
 import { requireUser } from "@/lib/session";
@@ -85,7 +86,14 @@ const intakeSchema = z.object({
   mileage: z.number().int().min(0).max(3_000_000).optional(),
   fuelLevel: z.enum(["1/4", "1/2", "3/4", "DOLU"]).optional(),
   items: z
-    .array(z.object({ serviceId: z.string(), price: z.number().min(0).max(10_000_000) }))
+    .array(
+      z.object({
+        serviceId: z.string(),
+        price: z.number().min(0).max(10_000_000),
+        details: z.unknown().optional(),
+        packageName: z.string().trim().max(80).optional(),
+      })
+    )
     .min(1, "En az bir hizmet seçin"),
   promisedAt: z.string().datetime({ offset: true }).optional(),
   stationId: z.string().optional(),
@@ -108,20 +116,28 @@ export async function createWorkOrder(
   const phone = normalizePhone(d.customerPhone);
 
   // Everything the client sent by id must belong to this business
-  const [services, multiplier, station] = await Promise.all([
+  const [services, multiplier, station, packages] = await Promise.all([
     prisma.service.findMany({ where: { businessId, id: { in: d.items.map((i) => i.serviceId) } } }),
     prisma.segmentMultiplier.findUnique({ where: { businessId_segment: { businessId, segment: d.segment } } }),
     d.stationId ? prisma.station.findFirst({ where: { id: d.stationId, businessId } }) : null,
+    prisma.servicePackage.findMany({ where: { businessId }, select: { name: true } }),
   ]);
+  const packageNames = new Set(packages.map((p) => p.name));
   if (services.length !== new Set(d.items.map((i) => i.serviceId)).size) return { error: "Seçilen hizmetlerden biri bulunamadı" };
   if (d.stationId && !station) return { error: "İstasyon bulunamadı" };
   const factor = Number(multiplier?.multiplier ?? 1);
 
-  const items = d.items.map((i) => {
+  let items;
+  try {
+    items = d.items.map((i) => {
     const s = services.find((x) => x.id === i.serviceId)!;
+    const details = parseDetails(s.kind, i.details);
     return {
       serviceId: s.id,
       name: s.name,
+      kind: s.kind,
+      details: details ?? Prisma.DbNull,
+      packageName: i.packageName && packageNames.has(i.packageName) ? i.packageName : null,
       basePrice: s.basePrice,
       multiplier: factor,
       quantity: 1,
@@ -129,7 +145,10 @@ export async function createWorkOrder(
       totalPrice: new Prisma.Decimal(Math.round(i.price * 100) / 100),
       listPrice: segmentPrice(Number(s.basePrice), factor),
     };
-  });
+    });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Hizmet ayrıntıları geçersiz" };
+  }
   const total = items.reduce((sum, i) => sum + Number(i.totalPrice), 0);
   const deposit = Math.min(d.deposit ?? 0, total);
 

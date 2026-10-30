@@ -3,16 +3,21 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Check, ChevronDown, Eye, EyeOff, Plus, Trash2 } from "lucide-react";
-import type { StationType, VehicleSegment } from "@prisma/client";
+import type { ServiceKind, StationType, VehicleSegment } from "@prisma/client";
 import { Button, Card, Eyebrow, Field, Input } from "@/components/ui";
 import { formatTL, parseTL, segmentPrice } from "@/lib/money";
+import { KINDS, WARRANTY_KINDS, warrantyLabel } from "@/lib/service-kinds";
 import { SEGMENTS } from "@/lib/stages";
 import { cn } from "@/lib/utils";
 import { deleteService, saveMultipliers, saveService, setServiceActive, type ActionResult } from "./actions";
+import { PackagesEditor, type PackageRow } from "./packages-editor";
 
 interface ServiceRow {
   id: string;
   name: string;
+  kind: ServiceKind;
+  defaultProduct: string;
+  warrantyMonths: number | null;
   description: string;
   basePrice: number;
   durationMinutes: number;
@@ -67,6 +72,7 @@ function ServiceForm({
 }) {
   const { pending, run } = useAction();
   const [price, setPrice] = useState(service && service.basePrice > 0 ? String(service.basePrice).replace(".", ",") : "");
+  const [kind, setKind] = useState<ServiceKind>(service?.kind ?? "OTHER");
   const parsed = parseTL(price);
 
   return (
@@ -75,6 +81,27 @@ function ServiceForm({
       className="space-y-4"
     >
       {service && <input type="hidden" name="id" value={service.id} />}
+      <input type="hidden" name="kind" value={kind} />
+      <div className="space-y-2">
+        <span className="block text-sm font-medium">Hizmet türü</span>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-label="Hizmet türü">
+          {(Object.keys(KINDS) as ServiceKind[]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              aria-pressed={kind === k}
+              onClick={() => setKind(k)}
+              className={cn(
+                "min-h-12 rounded-xl px-3 py-2 text-left text-sm",
+                kind === k ? "bg-accent font-semibold text-accent-ink" : "border border-line bg-raised"
+              )}
+            >
+              {KINDS[k].label}
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-muted">{KINDS[kind].hint}</p>
+      </div>
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
         <Field label="Hizmet adı">
           <Input name="name" required defaultValue={service?.name} placeholder="Örn. Seramik kaplama" />
@@ -139,6 +166,29 @@ function ServiceForm({
         </Field>
       </div>
 
+      {WARRANTY_KINDS.includes(kind) && (
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Varsayılan ürün" hint="Kabulde değiştirilebilir">
+            <Input
+              name="defaultProduct"
+              defaultValue={service?.defaultProduct}
+              placeholder={kind === "CERAMIC" ? "Örn. Gyeon Q2 Mohs" : kind === "PPF" ? "Örn. XPEL Ultimate" : "Örn. 3M Crystalline"}
+              maxLength={80}
+            />
+          </Field>
+          <Field label="Garanti">
+            <select name="warrantyMonths" defaultValue={service?.warrantyMonths ?? ""} className={selectClass}>
+              <option value="">Yok</option>
+              {[6, 12, 24, 36, 48, 60, 84, 120].map((m) => (
+                <option key={m} value={m}>
+                  {warrantyLabel(m)}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+      )}
+
       <Field label="Kısa açıklama" hint="Fişte ve müşteri sayfasında görünür">
         <Input name="description" defaultValue={service?.description} placeholder="Örn. 2 kat · 24 ay koruma" maxLength={160} />
       </Field>
@@ -158,10 +208,12 @@ function ServiceForm({
 
 export function ServicesEditor({
   services,
+  packages,
   multipliers,
   canEdit,
 }: {
   services: ServiceRow[];
+  packages: PackageRow[];
   multipliers: Record<VehicleSegment, number>;
   canEdit: boolean;
 }) {
@@ -216,7 +268,9 @@ export function ServicesEditor({
                   </span>
                   <span className="mt-0.5 block truncate text-sm text-muted">
                     {[
+                      KINDS[s.kind].label,
                       durationLabel(s.durationMinutes),
+                      s.warrantyMonths && `${warrantyLabel(s.warrantyMonths)} garanti`,
                       STATIONS.find((x) => x.value === s.stationType)?.label,
                       s.reminderMonths && `${s.reminderMonths} ay sonra hatırlat`,
                     ]
@@ -268,6 +322,8 @@ export function ServicesEditor({
           );
         })}
       </section>
+
+      <PackagesEditor packages={packages} services={services} canEdit={canEdit} />
 
       <section className="space-y-3" aria-labelledby="segments-title">
         <div>

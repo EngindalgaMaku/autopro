@@ -46,7 +46,7 @@ export default function SignUpPage() {
       </form>
       <p className="mt-6 text-center text-sm text-muted">
         Hesabınız var mı?{" "}
-        <Link href="/giris" className="font-semibold text-accent hover:text-accent-hover">
+        <Link href="/" className="font-semibold text-accent hover:text-accent-hover">
           Giriş yapın
         </Link>
       </p>

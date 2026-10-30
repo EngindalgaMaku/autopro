@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import type { StationType, VehicleSegment } from "@prisma/client";
+import type { ServiceKind, StationType, VehicleSegment } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { isValidPhone, normalizePhone } from "@/lib/phone";
 import { endSession, startSession } from "@/lib/session";
@@ -23,13 +23,23 @@ const STARTER_STATIONS: Array<{ name: string; type: StationType }> = [
   { name: "İç detay alanı", type: "INTERIOR" },
 ];
 
-const STARTER_SERVICES: Array<{ name: string; durationMinutes: number; stationType: StationType; reminderMonths?: number }> = [
-  { name: "Detaylı iç-dış temizlik", durationMinutes: 120, stationType: "WASH_BAY" },
-  { name: "Pasta cila", durationMinutes: 360, stationType: "DETAILING_ROOM" },
-  { name: "Seramik kaplama", durationMinutes: 960, stationType: "DETAILING_ROOM", reminderMonths: 6 },
-  { name: "Motor temizliği", durationMinutes: 60, stationType: "WASH_BAY" },
-  { name: "Ozon ile koku giderme", durationMinutes: 45, stationType: "INTERIOR" },
-  { name: "Koltuk yıkama", durationMinutes: 180, stationType: "INTERIOR" },
+const STARTER_SERVICES: Array<{
+  name: string;
+  kind: ServiceKind;
+  durationMinutes: number;
+  stationType: StationType;
+  reminderMonths?: number;
+  warrantyMonths?: number;
+}> = [
+  { name: "Detaylı iç-dış temizlik", kind: "WASH", durationMinutes: 120, stationType: "WASH_BAY" },
+  { name: "Pasta cila", kind: "POLISH", durationMinutes: 360, stationType: "DETAILING_ROOM" },
+  { name: "Seramik kaplama", kind: "CERAMIC", durationMinutes: 960, stationType: "DETAILING_ROOM", reminderMonths: 6, warrantyMonths: 24 },
+  { name: "PPF ön paket", kind: "PPF", durationMinutes: 960, stationType: "DETAILING_ROOM", warrantyMonths: 60 },
+  { name: "Cam filmi", kind: "WINDOW_FILM", durationMinutes: 180, stationType: "DETAILING_ROOM", warrantyMonths: 60 },
+  { name: "Jant seramiği", kind: "WHEEL", durationMinutes: 120, stationType: "DETAILING_ROOM", reminderMonths: 12 },
+  { name: "Koltuk yıkama", kind: "INTERIOR", durationMinutes: 180, stationType: "INTERIOR" },
+  { name: "Ozon ile koku giderme", kind: "INTERIOR", durationMinutes: 45, stationType: "INTERIOR" },
+  { name: "Motor temizliği", kind: "WASH", durationMinutes: 60, stationType: "WASH_BAY" },
 ];
 
 const signUpSchema = z.object({
@@ -115,5 +125,5 @@ export async function signIn(_prev: FormState, form: FormData): Promise<FormStat
 
 export async function signOut() {
   await endSession();
-  redirect("/giris");
+  redirect("/");
 }

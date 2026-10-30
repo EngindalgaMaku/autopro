@@ -15,7 +15,7 @@ export function LegalDraft({ title }: { title: string }) {
           hizmeti sunmak için işler.
         </p>
       </Card>
-      <Link href="/giris" className="text-sm font-semibold text-accent">
+      <Link href="/" className="text-sm font-semibold text-accent">
         Girişe dön
       </Link>
     </main>

@@ -8,12 +8,17 @@ export const metadata = { title: "Hizmetler ve Fiyatlar" };
 
 export default async function ServicesPage() {
   const user = await requireUser();
-  const [services, multipliers] = await Promise.all([
+  const [services, multipliers, packages] = await Promise.all([
     prisma.service.findMany({
       where: { businessId: user.businessId },
       orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }],
     }),
     prisma.segmentMultiplier.findMany({ where: { businessId: user.businessId } }),
+    prisma.servicePackage.findMany({
+      where: { businessId: user.businessId },
+      orderBy: { sortOrder: "asc" },
+      include: { items: { select: { serviceId: true } } },
+    }),
   ]);
 
   const factor = Object.fromEntries(
@@ -28,9 +33,18 @@ export default async function ServicesPage() {
       <ServicesEditor
         canEdit={canManage(user.role)}
         multipliers={factor}
+        packages={packages.map((p) => ({
+          id: p.id,
+          name: p.name,
+          price: Number(p.price),
+          serviceIds: p.items.map((i) => i.serviceId),
+        }))}
         services={services.map((s) => ({
           id: s.id,
           name: s.name,
+          kind: s.kind,
+          defaultProduct: s.defaultProduct ?? "",
+          warrantyMonths: s.warrantyMonths,
           description: s.description ?? "",
           basePrice: Number(s.basePrice),
           durationMinutes: s.durationMinutes,

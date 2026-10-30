@@ -4,6 +4,7 @@ import { Card } from "@/components/ui";
 import { prisma } from "@/lib/db";
 import { formatTL } from "@/lib/money";
 import { whatsappNumber } from "@/lib/phone";
+import { detailSummary, type ItemDetails } from "@/lib/service-kinds";
 import { BOARD_STAGES, STAGES } from "@/lib/stages";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +21,7 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
     include: {
       business: { select: { name: true, phone: true } },
       vehicle: { select: { plate: true, brand: true, model: true } },
-      items: { select: { name: true, totalPrice: true } },
+      items: { select: { id: true, name: true, totalPrice: true, kind: true, details: true, packageName: true } },
       payments: { select: { amount: true } },
     },
   });
@@ -77,12 +78,20 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
       <Card className="p-4">
         <h2 className="mb-2 font-display text-lg font-semibold">Yapılan işler</h2>
         <ul className="divide-y divide-line">
-          {order.items.map((i) => (
-            <li key={i.name} className="flex justify-between gap-3 py-2 text-sm">
-              <span>{i.name}</span>
-              <span className="tabular-nums">{formatTL(i.totalPrice)}</span>
-            </li>
-          ))}
+          {order.items.map((i) => {
+            const detail = detailSummary(i.kind, i.details as ItemDetails | null);
+            return (
+              <li key={i.id} className="flex justify-between gap-3 py-2 text-sm">
+                <span className="min-w-0">
+                  <span className="block">{i.name}</span>
+                  {(detail || i.packageName) && (
+                    <span className="block text-xs text-muted">{[i.packageName && `Paket: ${i.packageName}`, detail].filter(Boolean).join(" · ")}</span>
+                  )}
+                </span>
+                <span className="shrink-0 tabular-nums">{formatTL(i.totalPrice)}</span>
+              </li>
+            );
+          })}
         </ul>
         <div className="mt-2 space-y-1 border-t border-line pt-3 text-sm">
           <p className="flex justify-between">

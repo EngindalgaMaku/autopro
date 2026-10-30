@@ -4,22 +4,49 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { AlertTriangle, Check, CheckCircle2, Loader2, MessageCircle, Plus } from "lucide-react";
-import type { PaymentMethod, VehicleSegment } from "@prisma/client";
+import type { PaymentMethod, ServiceKind, VehicleSegment } from "@prisma/client";
 import { Plate } from "@/components/plate";
 import { Button, buttonStyles, Card, Eyebrow, Field, Input } from "@/components/ui";
 import { formatTL, parseTL, segmentPrice } from "@/lib/money";
 import { formatPhone, isValidPhone, whatsappNumber } from "@/lib/phone";
 import { formatPlate, isValidPlate, normalizePlate } from "@/lib/plate";
+import { KINDS, type ItemDetails } from "@/lib/service-kinds";
 import { SEGMENTS } from "@/lib/stages";
 import { cn } from "@/lib/utils";
 import { createWorkOrder, findByPlate, findCustomerByPhone, type VehicleMatch } from "./actions";
+import { hasDetails, ItemDetailsFields } from "./item-details";
 
 interface ServiceOption {
   id: string;
   name: string;
+  kind: ServiceKind;
+  defaultProduct: string;
+  warrantyMonths: number | null;
   description: string;
   basePrice: number;
   durationMinutes: number;
+}
+
+interface PackageOption {
+  id: string;
+  name: string;
+  price: number;
+  serviceIds: string[];
+}
+
+/**
+ * A package's price for the vehicle class, shared out over its services in proportion to their
+ * list prices (equally when none has a price), so each item keeps a price of its own and the
+ * items add up to the package price exactly.
+ */
+function spreadPackage(pkg: PackageOption, services: ServiceOption[], factor: number) {
+  const target = Math.round(pkg.price * factor);
+  const members = pkg.serviceIds.map((id) => services.find((s) => s.id === id)!).filter(Boolean);
+  const weights = members.map((s) => s.basePrice);
+  const sum = weights.reduce((a, b) => a + b, 0);
+  const shares = members.map((_, i) => Math.floor(target * (sum > 0 ? weights[i] / sum : 1 / members.length)));
+  shares[shares.length - 1] += target - shares.reduce((a, b) => a + b, 0);
+  return Object.fromEntries(members.map((s, i) => [s.id, shares[i]]));
 }
 
 const SEGMENT_KEYS = Object.keys(SEGMENTS) as VehicleSegment[];
@@ -64,12 +91,14 @@ function Chip({ selected, onClick, children }: { selected: boolean; onClick: () 
 
 export function IntakeForm({
   services,
+  packages,
   multipliers,
   stations,
   businessName,
   initialPlate,
 }: {
   services: ServiceOption[];
+  packages: PackageOption[];
   multipliers: Record<VehicleSegment, number>;
   stations: Array<{ id: string; name: string }>;
   businessName: string;
@@ -90,6 +119,10 @@ export function IntakeForm({
   const [fuel, setFuel] = useState<string | null>(null);
   // serviceId → the price typed for it (starts at the list price for the vehicle class)
   const [picked, setPicked] = useState<Record<string, string>>({});
+  // serviceId → what was applied (product, layers, zones…), for kinds that record it
+  const [details, setDetails] = useState<Record<string, ItemDetails>>({});
+  // serviceId → the package it came in with; its price is the package's share
+  const [fromPackage, setFromPackage] = useState<Record<string, string>>({});
   const [promisedDate, setPromisedDate] = useState("");
   const [promisedTime, setPromisedTime] = useState("17:00");
   const [stationId, setStationId] = useState("");
@@ -147,12 +180,25 @@ export function IntakeForm({
     };
   }, [customerPhone, match]);
 
-  // A different vehicle class moves untouched prices to the new list price
+  const packageShares = (seg: VehicleSegment) =>
+    Object.fromEntries(
+      packages
+        .filter((p) => Object.values(fromPackage).includes(p.name))
+        .flatMap((p) => Object.entries(spreadPackage(p, services, multipliers[seg])))
+    );
+
+  // A different vehicle class moves untouched prices to the new list price (package shares too)
   const changeSegment = (next: VehicleSegment) => {
+    const oldShares = packageShares(segment);
+    const newShares = packageShares(next);
     setPicked((prev) =>
       Object.fromEntries(
         Object.entries(prev).map(([id, price]) => {
           const s = services.find((x) => x.id === id)!;
+          if (fromPackage[id]) {
+            const untouched = parseTL(price) === oldShares[id];
+            return [id, untouched ? priceText(newShares[id]) : price];
+          }
           const untouched = parseTL(price) === listPrice(s) || price === "";
           return [id, untouched ? priceText(listPrice(s, next)) : price];
         })
@@ -161,13 +207,53 @@ export function IntakeForm({
     setSegment(next);
   };
 
-  const toggle = (s: ServiceOption) =>
+  const defaultDetails = (s: ServiceOption): ItemDetails =>
+    Object.fromEntries(
+      Object.entries({ product: s.defaultProduct || undefined, warrantyMonths: s.warrantyMonths ?? undefined }).filter(([, v]) => v !== undefined)
+    );
+
+  const toggle = (s: ServiceOption) => {
+    const on = s.id in picked;
     setPicked((prev) => {
       const next = { ...prev };
-      if (s.id in next) delete next[s.id];
+      if (on) delete next[s.id];
       else next[s.id] = priceText(listPrice(s));
       return next;
     });
+    if (!on && hasDetails(s.kind)) setDetails((d) => ({ ...d, [s.id]: d[s.id] ?? defaultDetails(s) }));
+    // Taking a service out of a package ends the package price for the rest
+    if (on && fromPackage[s.id]) {
+      const pkgName = fromPackage[s.id];
+      setFromPackage((f) => Object.fromEntries(Object.entries(f).filter(([, n]) => n !== pkgName)));
+      setPicked((prev) => {
+        const next = { ...prev };
+        for (const [id, n] of Object.entries(fromPackage)) {
+          if (n === pkgName && id !== s.id) next[id] = priceText(listPrice(services.find((x) => x.id === id)!));
+        }
+        return next;
+      });
+    }
+  };
+
+  const activePackages = new Set(Object.values(fromPackage));
+  const togglePackage = (pkg: PackageOption) => {
+    if (activePackages.has(pkg.name)) {
+      setPicked((prev) => Object.fromEntries(Object.entries(prev).filter(([id]) => fromPackage[id] !== pkg.name)));
+      setFromPackage((f) => Object.fromEntries(Object.entries(f).filter(([, n]) => n !== pkg.name)));
+      return;
+    }
+    const shares = spreadPackage(pkg, services, multipliers[segment]);
+    setPicked((prev) => ({ ...prev, ...Object.fromEntries(Object.entries(shares).map(([id, p]) => [id, priceText(p)])) }));
+    setFromPackage((f) => ({ ...f, ...Object.fromEntries(pkg.serviceIds.map((id) => [id, pkg.name])) }));
+    setDetails((d) => {
+      const next = { ...d };
+      for (const id of pkg.serviceIds) {
+        const s = services.find((x) => x.id === id);
+        if (s && hasDetails(s.kind) && !next[id]) next[id] = defaultDetails(s);
+      }
+      return next;
+    });
+  };
 
   const total = useMemo(
     () => Object.values(picked).reduce((sum, p) => sum + (parseTL(p) ?? 0), 0),
@@ -201,7 +287,12 @@ export function IntakeForm({
         customerPhone,
         mileage: mileage ? Number(mileage.replace(/\D/g, "")) : undefined,
         fuelLevel: (fuel as "1/4" | "1/2" | "3/4" | "DOLU" | null) ?? undefined,
-        items: Object.entries(picked).map(([serviceId, price]) => ({ serviceId, price: parseTL(price) ?? 0 })),
+        items: Object.entries(picked).map(([serviceId, price]) => ({
+          serviceId,
+          price: parseTL(price) ?? 0,
+          details: details[serviceId],
+          packageName: fromPackage[serviceId],
+        })),
         promisedAt: promisedDate ? `${promisedDate}T${promisedTime || "17:00"}:00+03:00` : undefined,
         stationId: stationId || undefined,
         deposit: depositValue || undefined,
@@ -232,6 +323,8 @@ export function IntakeForm({
     setMileage("");
     setFuel(null);
     setPicked({});
+    setDetails({});
+    setFromPackage({});
     setPromisedDate("");
     setStationId("");
     setDeposit("");
@@ -428,10 +521,25 @@ export function IntakeForm({
                 Hizmet yok. <Link href="/hizmetler" className="text-accent">Hizmet ekleyin</Link>.
               </p>
             ) : (
+              <>
+              {packages.length > 0 && (
+                <div className="space-y-2 border-b border-line p-3">
+                  <Eyebrow>Paketler</Eyebrow>
+                  <div className="flex flex-wrap gap-2">
+                    {packages.map((p) => (
+                      <Chip key={p.id} selected={activePackages.has(p.name)} onClick={() => togglePackage(p)}>
+                        <span className="block leading-tight">{p.name}</span>
+                        <span className="block text-xs opacity-75">{tl(Math.round(p.price * multipliers[segment]))}</span>
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+              )}
               <ul className="space-y-1 p-2">
                 {services.map((s) => {
                   const on = s.id in picked;
                   const list = listPrice(s);
+                  const pkg = fromPackage[s.id];
                   return (
                     <li key={s.id} className={cn("rounded-xl", on && "bg-raised")}>
                       <button
@@ -451,7 +559,9 @@ export function IntakeForm({
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block font-medium">{s.name}</span>
-                          {s.description && <span className="block truncate text-sm text-muted">{s.description}</span>}
+                          <span className="block truncate text-sm text-muted">
+                            {pkg ? `Paket: ${pkg}` : [KINDS[s.kind].label, s.description].filter(Boolean).join(" · ")}
+                          </span>
                         </span>
                         {!on && (
                           <span className={cn("font-display text-lg font-semibold tabular-nums", list === 0 && "text-sm text-accent")}>
@@ -481,10 +591,21 @@ export function IntakeForm({
                           </label>
                         </div>
                       )}
+                      {on && hasDetails(s.kind) && (
+                        <div className="px-3 pb-3">
+                          <ItemDetailsFields
+                            kind={s.kind}
+                            label={s.name}
+                            value={details[s.id] ?? {}}
+                            onChange={(next) => setDetails({ ...details, [s.id]: next })}
+                          />
+                        </div>
+                      )}
                     </li>
                   );
                 })}
               </ul>
+              </>
             )}
           </Card>
         </section>

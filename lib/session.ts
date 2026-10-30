@@ -51,12 +51,12 @@ export async function readSession(): Promise<Session | null> {
 /** The signed-in user for an app page; sends anyone else to sign in */
 export async function requireUser() {
   const session = await readSession();
-  if (!session) redirect("/giris");
+  if (!session) redirect("/");
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
     select: { id: true, name: true, role: true, isActive: true, businessId: true, business: { select: { id: true, name: true } } },
   });
-  if (!user || !user.isActive || user.businessId !== session.businessId) redirect("/giris");
+  if (!user || !user.isActive || user.businessId !== session.businessId) redirect("/");
   return user;
 }
 
