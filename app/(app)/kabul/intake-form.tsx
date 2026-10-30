@@ -129,7 +129,7 @@ export function IntakeForm({
   const [deposit, setDeposit] = useState("");
   const [depositMethod, setDepositMethod] = useState<PaymentMethod>("CASH");
   const [notes, setNotes] = useState("");
-  const [done, setDone] = useState<{ number: string; trackingToken: string; total: number; plate: string } | null>(null);
+  const [done, setDone] = useState<{ id: string; number: string; trackingToken: string; total: number; plate: string } | null>(null);
   const [saving, startSaving] = useTransition();
   const plateRef = useRef<HTMLInputElement>(null);
 
@@ -303,7 +303,7 @@ export function IntakeForm({
         toast.error(result.error);
         return;
       }
-      setDone({ number: result.number, trackingToken: result.trackingToken, total, plate: normalizePlate(plate) });
+      setDone({ id: result.id, number: result.number, trackingToken: result.trackingToken, total, plate: normalizePlate(plate) });
       window.scrollTo({ top: 0 });
     });
   };
@@ -360,8 +360,8 @@ export function IntakeForm({
             <Plus className="h-5 w-5" aria-hidden="true" />
             Yeni araç kabul
           </Button>
-          <Link href="/atolye" className={buttonStyles({ variant: "ghost", size: "lg", className: "w-full" })}>
-            Atölyeye git
+          <Link href={`/is/${done.id}`} className={buttonStyles({ variant: "ghost", size: "lg", className: "w-full" })}>
+            İş emrini aç
           </Link>
         </div>
       </div>

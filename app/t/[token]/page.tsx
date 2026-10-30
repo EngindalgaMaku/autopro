@@ -4,6 +4,7 @@ import { Card } from "@/components/ui";
 import { prisma } from "@/lib/db";
 import { formatTL } from "@/lib/money";
 import { whatsappNumber } from "@/lib/phone";
+import { formatPlate } from "@/lib/plate";
 import { detailSummary, type ItemDetails } from "@/lib/service-kinds";
 import { BOARD_STAGES, STAGES } from "@/lib/stages";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,19 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
   const finished = order.stage === "DELIVERED" || order.stage === "VALET_DELIVERY";
   const steps = ["Kabul", "Yıkama", "Uygulama", "Kontrol", "Hazır"];
 
+  // The warranty card: works the shop recorded a warranty for, counted from the handover day
+  const fmt = (d: Date) => d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Istanbul" });
+  const warranties =
+    order.stage === "DELIVERED" && order.deliveredAt
+      ? order.items.flatMap((i) => {
+          const d = (i.details ?? {}) as ItemDetails;
+          if (!d.warrantyMonths) return [];
+          const until = new Date(order.deliveredAt!);
+          until.setMonth(until.getMonth() + d.warrantyMonths);
+          return [{ id: i.id, name: i.name, product: d.product, from: fmt(order.deliveredAt!), until: fmt(until) }];
+        })
+      : [];
+
   return (
     <main className="mx-auto max-w-md space-y-4 px-4 py-6">
       <header className="flex items-center justify-between">
@@ -48,7 +62,7 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
         </div>
         <div>
           <p className="text-sm text-muted">Aracınız şu anda</p>
-          <p className={cn("font-display text-[26px] font-bold", order.stage === "READY" ? "text-ready" : "text-accent")}>
+          <p className={cn("font-display text-[26px] font-bold", order.stage === "READY" || order.stage === "DELIVERED" ? "text-ready" : order.stage === "CANCELLED" ? "text-danger" : "text-accent")}>
             {STAGES[order.stage].customerLabel}
           </p>
           {order.promisedAt && !finished && order.stage !== "CANCELLED" && (
@@ -74,6 +88,29 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
           </ol>
         )}
       </Card>
+
+      {warranties.length > 0 && (
+        <Card className="space-y-3 border-accent/60 p-4">
+          <div>
+            <h2 className="font-display text-lg font-semibold">Garanti belgesi</h2>
+            <p className="text-xs text-muted">
+              {formatPlate(order.vehicle.plate)} · {order.number}
+            </p>
+          </div>
+          <ul className="space-y-2">
+            {warranties.map((w) => (
+              <li key={w.id} className="rounded-xl bg-raised p-3 text-sm">
+                <p className="font-semibold">{w.name}</p>
+                {w.product && <p className="text-muted">{w.product}</p>}
+                <p className="mt-1">
+                  {w.from} – <strong>{w.until}</strong>
+                </p>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-muted">Garanti koşulları {order.business.name} tarafından belirlenir.</p>
+        </Card>
+      )}
 
       <Card className="p-4">
         <h2 className="mb-2 font-display text-lg font-semibold">Yapılan işler</h2>

@@ -25,3 +25,39 @@ export const SEGMENTS: Record<VehicleSegment, { label: string; defaultMultiplier
   COMMERCIAL: { label: "Ticari", defaultMultiplier: 1.8 },
   MOTORCYCLE: { label: "Motosiklet", defaultMultiplier: 0.6 },
 };
+
+/** Moves the workshop can make from each stage (a check can send a car back for rework) */
+export const TRANSITIONS: Record<WorkStage, WorkStage[]> = {
+  RECEIVED: ["WASHING", "DETAILING", "QUALITY_CHECK", "CANCELLED"],
+  WASHING: ["DETAILING", "QUALITY_CHECK", "CANCELLED"],
+  DETAILING: ["QUALITY_CHECK", "CANCELLED"],
+  QUALITY_CHECK: ["READY", "DETAILING", "CANCELLED"],
+  READY: ["DELIVERED", "VALET_DELIVERY", "QUALITY_CHECK"],
+  VALET_DELIVERY: ["DELIVERED", "READY"],
+  DELIVERED: [],
+  CANCELLED: [],
+};
+
+export const canMove = (from: WorkStage, to: WorkStage) => TRANSITIONS[from].includes(to);
+
+/**
+ * The one button that moves an order on. A wash-only order skips the detailing stage, since
+ * nothing happens there for it.
+ */
+export function nextStage(stage: WorkStage, needsDetailing: boolean): { target: WorkStage; label: string } | null {
+  switch (stage) {
+    case "RECEIVED":
+      return { target: "WASHING", label: "Yıkamaya al" };
+    case "WASHING":
+      return needsDetailing ? { target: "DETAILING", label: "Detailing'e al" } : { target: "QUALITY_CHECK", label: "Son kontrole al" };
+    case "DETAILING":
+      return { target: "QUALITY_CHECK", label: "Son kontrole al" };
+    case "QUALITY_CHECK":
+      return { target: "READY", label: "Hazır" };
+    case "READY":
+    case "VALET_DELIVERY":
+      return { target: "DELIVERED", label: "Teslim et" };
+    default:
+      return null;
+  }
+}

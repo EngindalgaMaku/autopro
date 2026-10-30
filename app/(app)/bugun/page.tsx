@@ -7,6 +7,7 @@ import { whatsappNumber } from "@/lib/phone";
 import { requireUser } from "@/lib/session";
 import { addDays, startOfDayTR } from "@/lib/turkey-time";
 import { signOut } from "../../(auth)/actions";
+import { ReminderActions } from "./reminder-actions";
 
 export const metadata = { title: "Bugün" };
 
@@ -132,16 +133,12 @@ export default async function TodayPage() {
                     <span className="truncate font-semibold">{r.customer.name}</span>
                   </div>
                   <p className="text-sm text-muted">{r.title}</p>
-                  <a
+                  <ReminderActions
+                    id={r.id}
                     href={`https://wa.me/${whatsappNumber(r.customer.phone)}?text=${encodeURIComponent(
                       `Merhaba ${r.customer.name}, ${r.title.toLocaleLowerCase("tr-TR")} zamanı geldi. Size uygun bir gün için randevu ayarlayalım mı? - ${user.business.name}`
                     )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={buttonStyles({ size: "sm", className: "w-full" })}
-                  >
-                    WhatsApp gönder
-                  </a>
+                  />
                 </Card>
               </li>
             ))}
