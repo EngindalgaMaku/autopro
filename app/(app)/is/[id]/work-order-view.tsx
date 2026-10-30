@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Ban, Check, Copy, Loader2, MessageCircle, Phone, RotateCcw, Send, Trash2, Truck, Wallet } from "lucide-react";
+import { ArrowLeft, Ban, Check, ChevronRight, Copy, Loader2, MessageCircle, Phone, RotateCcw, Send, Trash2, Truck, Wallet } from "lucide-react";
 import type { PaymentMethod, WorkStage } from "@prisma/client";
 import { Plate } from "@/components/plate";
 import { Button, Card, Eyebrow, Input } from "@/components/ui";
@@ -34,6 +34,7 @@ interface OrderView {
   total: number;
   paid: number;
   needsDetailing: boolean;
+  record: { marks: number; readings: number; photos: number; approved: boolean };
   items: Array<{ id: string; name: string; price: number; detail: string }>;
   payments: Array<{ id: string; amount: number; method: PaymentMethod; note: string | null; paidAt: string }>;
   events: Array<{ id: string; stage: WorkStage; note: string | null; at: string; by: string | null }>;
@@ -224,6 +225,20 @@ export function WorkOrderView({
             )}
             {order.notes && <p className="col-span-2 rounded-lg bg-raised px-3 py-2 text-sm">{order.notes}</p>}
           </Card>
+
+          <Link
+            href={`/is/${order.id}/kayit`}
+            className="flex items-center gap-3 rounded-card border border-line bg-surface p-4 transition-colors hover:border-line-strong"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">Hasar, boya ölçümü ve fotoğraflar</span>
+              <span className="block text-sm text-muted">
+                {order.record.marks} hasar · {order.record.readings} ölçüm · {order.record.photos} fotoğraf
+                {order.record.approved ? " · müşteri onayladı" : ""}
+              </span>
+            </span>
+            <ChevronRight className="h-5 w-5 shrink-0 text-muted" aria-hidden="true" />
+          </Link>
 
           <Card className="p-4">
             <Eyebrow>Yapılacak işler</Eyebrow>

@@ -21,6 +21,8 @@ export default async function WorkOrderPage({ params }: { params: Promise<{ id: 
         items: { orderBy: { createdAt: "asc" } },
         payments: { orderBy: { paidAt: "asc" } },
         events: { orderBy: { createdAt: "desc" } },
+        inspection: { select: { customerApprovedAt: true, _count: { select: { marks: true, readings: true } } } },
+        _count: { select: { photos: true } },
       },
     }),
     prisma.user.findMany({ where: { businessId: user.businessId, isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
@@ -54,6 +56,12 @@ export default async function WorkOrderPage({ params }: { params: Promise<{ id: 
         total: Number(order.totalAmount),
         paid,
         needsDetailing: order.items.some((i) => DETAILING_KINDS.includes(i.kind)),
+        record: {
+          marks: order.inspection?._count.marks ?? 0,
+          readings: order.inspection?._count.readings ?? 0,
+          photos: order._count.photos,
+          approved: !!order.inspection?.customerApprovedAt,
+        },
         items: order.items.map((i) => ({
           id: i.id,
           name: i.name,

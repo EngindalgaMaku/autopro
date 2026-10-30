@@ -8,6 +8,9 @@ import { formatPlate } from "@/lib/plate";
 import { detailSummary, type ItemDetails } from "@/lib/service-kinds";
 import { BOARD_STAGES, STAGES } from "@/lib/stages";
 import { cn } from "@/lib/utils";
+import { DAMAGE_KINDS, PANELS, PART_LABELS } from "@/lib/vehicle-parts";
+import { VehicleDiagram } from "@/components/vehicle-diagram";
+import { ApproveButton } from "./approve-button";
 
 // The customer's page, opened from the WhatsApp link: no sign-in, so it shows the car and
 // the work only — never the owner's phone or address
@@ -24,9 +27,20 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
       vehicle: { select: { plate: true, brand: true, model: true } },
       items: { select: { id: true, name: true, totalPrice: true, kind: true, details: true, packageName: true } },
       payments: { select: { amount: true } },
+      inspection: {
+        include: {
+          marks: { orderBy: { number: "asc" }, include: { photos: { select: { id: true } } } },
+          readings: true,
+        },
+      },
+      photos: { where: { kind: { in: ["BEFORE", "AFTER"] } }, orderBy: { createdAt: "asc" }, select: { id: true, kind: true } },
     },
   });
   if (!order) notFound();
+  const ins = order.inspection;
+  const photoUrl = (id: string) => `/api/photos/${id}?t=${token}`;
+  const reading = (part: string, phase: "BEFORE" | "AFTER") => ins?.readings.find((r) => r.part === part && r.phase === phase)?.microns;
+  const measured = PANELS.filter((p) => reading(p.key, "BEFORE") || reading(p.key, "AFTER"));
 
   const paid = order.payments.reduce((s, p) => s + Number(p.amount), 0);
   const total = Number(order.totalAmount);
@@ -109,6 +123,106 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
             ))}
           </ul>
           <p className="text-xs text-muted">Garanti koşulları {order.business.name} tarafından belirlenir.</p>
+        </Card>
+      )}
+
+      {ins && (ins.marks.length > 0 || ins.customerApprovedAt || order.stage === "RECEIVED") && (
+        <Card className="space-y-3 p-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="font-display text-lg font-semibold">Kabulde kayda geçenler</h2>
+            <span className="text-xs text-muted">
+              {ins.createdAt.toLocaleString("tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" })}
+            </span>
+          </div>
+          {ins.marks.length === 0 ? (
+            <p className="text-sm text-muted">Aracınızda kayda geçen hasar yok.</p>
+          ) : (
+            <div className="grid grid-cols-[120px_minmax(0,1fr)] gap-3">
+              <VehicleDiagram className="w-full" marks={ins.marks} />
+              <ol className="space-y-2">
+                {ins.marks.map((m) => (
+                  <li key={m.id} className="space-y-1.5 text-sm">
+                    <p>
+                      <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-danger text-[11px] font-bold text-[#1a0a0a]">{m.number}</span>
+                      {PART_LABELS[m.part]} · {DAMAGE_KINDS[m.kind]}
+                    </p>
+                    {m.note && <p className="text-xs text-muted">{m.note}</p>}
+                    {m.photos.length > 0 && (
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {m.photos.map((p) => (
+                          <a key={p.id} href={photoUrl(p.id)} target="_blank" rel="noreferrer" className="block aspect-square overflow-hidden rounded-md bg-raised">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={photoUrl(p.id)} alt={`${m.number} numaralı hasar`} className="h-full w-full object-cover" loading="lazy" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+          {ins.customerApprovedAt ? (
+            <p className="rounded-xl bg-ready/15 px-3 py-2 text-sm font-semibold text-ready">
+              Onayladınız ·{" "}
+              {ins.customerApprovedAt.toLocaleString("tr-TR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" })}
+            </p>
+          ) : (
+            <>
+              <p className="text-sm text-muted">
+                Aracınız bu durumda teslim alındı. Bir itirazınız varsa aşağıdan bize yazın; doğruysa onaylayın.
+              </p>
+              <ApproveButton token={token} />
+            </>
+          )}
+        </Card>
+      )}
+
+      {measured.length > 0 && (
+        <Card className="overflow-hidden">
+          <table className="w-full text-sm">
+            <caption className="px-4 pt-4 text-left font-display text-lg font-semibold">Boya kalınlığı ölçümü</caption>
+            <thead className="text-xs text-muted">
+              <tr>
+                <th className="px-4 py-2 text-left font-medium">Parça</th>
+                <th className="px-2 py-2 text-right font-medium">Kabulde</th>
+                <th className="px-4 py-2 text-right font-medium">İşlem sonrası</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {measured.map((p) => (
+                <tr key={p.key}>
+                  <td className="px-4 py-2">{p.label}</td>
+                  <td className="px-2 py-2 text-right tabular-nums">{reading(p.key, "BEFORE") ?? "—"}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">{reading(p.key, "AFTER") ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="px-4 pb-4 pt-1 text-xs text-muted">Değerler mikron (µm) cinsinden, atölyenin ölçüm cihazıyla alınmıştır.</p>
+        </Card>
+      )}
+
+      {order.photos.length > 0 && (
+        <Card className="space-y-3 p-4">
+          <h2 className="font-display text-lg font-semibold">Öncesi ve sonrası</h2>
+          {(["BEFORE", "AFTER"] as const).map((k) => {
+            const list = order.photos.filter((p) => p.kind === k);
+            if (!list.length) return null;
+            return (
+              <div key={k} className="space-y-1.5">
+                <p className="text-sm text-muted">{k === "BEFORE" ? "Öncesi" : "Sonrası"}</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {list.map((p) => (
+                    <a key={p.id} href={photoUrl(p.id)} target="_blank" rel="noreferrer" className="block aspect-square overflow-hidden rounded-lg bg-raised">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={photoUrl(p.id)} alt={k === "BEFORE" ? "İşlem öncesi" : "İşlem sonrası"} className="h-full w-full object-cover" loading="lazy" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </Card>
       )}
 

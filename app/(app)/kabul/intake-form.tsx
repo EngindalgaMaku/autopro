@@ -347,11 +347,15 @@ export function IntakeForm({
         </div>
         <p className="font-display text-2xl font-bold text-accent">{tl(done.total)}</p>
         <div className="space-y-2">
+          {/* Damage is recorded before the link goes out, so the customer sees it when they open it */}
+          <Link href={`/is/${done.id}/kayit`} className={buttonStyles({ size: "lg", className: "w-full" })}>
+            Hasar kaydına geç
+          </Link>
           <a
             href={`https://wa.me/${whatsappNumber(customerPhone)}?text=${encodeURIComponent(message)}`}
             target="_blank"
             rel="noreferrer"
-            className={buttonStyles({ size: "lg", className: "w-full" })}
+            className={buttonStyles({ variant: "secondary", size: "lg", className: "w-full" })}
           >
             <MessageCircle className="h-5 w-5" aria-hidden="true" />
             Takip bağlantısını WhatsApp&apos;tan gönder

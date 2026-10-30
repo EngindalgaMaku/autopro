@@ -337,10 +337,32 @@ model Inspection {
   signaturePath      String?   @map("signature_path")
   createdAt          DateTime  @default(now()) @map("created_at")
 
-  workOrder WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  workOrder WorkOrder      @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
   marks     DamageMark[]
+  readings  PaintReading[]
 
   @@map("inspections")
+}
+
+enum ReadingPhase {
+  BEFORE // kabulde
+  AFTER // iş bittikten sonra (cila ne kadar boya aldı)
+}
+
+// Paint thickness per panel in microns, as read from the shop's gauge. The app only records
+// and compares; what counts as repainted or too thin is the detailer's call.
+model PaintReading {
+  id           String       @id @default(cuid())
+  inspectionId String       @map("inspection_id")
+  part         String       @db.VarChar(40) // lib/vehicle-parts.ts key
+  phase        ReadingPhase
+  microns      Int
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@unique([inspectionId, part, phase])
+  @@map("paint_readings")
 }
 
 enum DamageKind {
