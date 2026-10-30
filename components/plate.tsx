@@ -2,6 +2,7 @@ import { formatPlate } from "@/lib/plate";
 import { cn } from "@/lib/utils";
 
 const SIZES = {
+  xs: { box: "h-7 border-2 rounded-md", strip: "w-2.5", text: "text-[15px] tracking-[0.5px] px-1.5" },
   sm: { box: "h-8 border-2 rounded-md", strip: "w-3.5", text: "text-lg tracking-[1.5px] px-2" },
   md: { box: "h-11 border-2 rounded-lg", strip: "w-5", text: "text-2xl tracking-[2px] px-3" },
   lg: { box: "h-[78px] border-[3px] rounded-[10px]", strip: "w-9", text: "text-[46px] tracking-[3px] px-4" },

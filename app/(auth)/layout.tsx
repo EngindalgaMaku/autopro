@@ -1,10 +1,24 @@
+import { AuthFeatures, AuthShowcase } from "@/components/auth-showcase";
 import { BrandMark } from "@/components/brand";
 
+// Wide screens: what AutoPro does on the left, the form on the right.
+// Phones and tablets in portrait: the brand, the form, and the main points below it.
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-col items-center px-4 py-10">
-      <BrandMark />
-      <div className="mt-8 w-full max-w-sm">{children}</div>
+    <div className="min-h-dvh lg:grid lg:grid-cols-12">
+      <div className="hidden lg:col-span-7 lg:block">
+        <AuthShowcase />
+      </div>
+      <div className="flex min-h-dvh flex-col px-4 py-10 sm:px-8 lg:col-span-5 lg:justify-center lg:px-12 xl:px-16">
+        <div className="mx-auto w-full max-w-sm">
+          <div className="mb-8 lg:hidden">
+            <BrandMark />
+            <p className="mt-2 text-sm text-muted">Detailing ve oto kuaför atölyeleri için</p>
+          </div>
+          {children}
+          <AuthFeatures />
+        </div>
+      </div>
     </div>
   );
 }
