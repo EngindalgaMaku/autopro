@@ -278,7 +278,15 @@ export function InspectionEditor({
                           {m.photoIds.length > 0 && (
                             <div className="grid grid-cols-4 gap-2">
                               {m.photoIds.map((pid) => (
-                                <Thumb key={pid} id={pid} disabled={locked} onDelete={() => run(() => deletePhoto(orderId, pid), "Fotoğraf silindi")} />
+                                <Thumb
+                                  key={pid}
+                                  id={pid}
+                                  disabled={locked}
+                                  onDelete={() =>
+                                    window.confirm("Bu hasar fotoğrafı silinsin mi?") &&
+                                    run(() => deletePhoto(orderId, pid), "Fotoğraf silindi")
+                                  }
+                                />
                               ))}
                             </div>
                           )}
@@ -374,7 +382,14 @@ export function InspectionEditor({
                 ) : (
                   <div className="grid grid-cols-3 gap-2">
                     {list.map((p) => (
-                      <Thumb key={p.id} id={p.id} onDelete={() => run(() => deletePhoto(orderId, p.id), "Fotoğraf silindi")} />
+                      <Thumb
+                        key={p.id}
+                        id={p.id}
+                        onDelete={() =>
+                          window.confirm("Bu fotoğraf silinsin mi?") &&
+                          run(() => deletePhoto(orderId, p.id), "Fotoğraf silindi")
+                        }
+                      />
                     ))}
                   </div>
                 )}

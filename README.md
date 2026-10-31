@@ -8,6 +8,7 @@ Detailing ve oto kuaför atölyeleri için araç kabul, hasar kaydı, atölye pa
 npm install
 cp .env.example .env   # DATABASE_URL ve SESSION_SECRET doldurulur
 npx prisma db push
+npm run db:seed        # Örnek atölye, iş emirleri, usta ve demo hesapları yükler
 npm run dev
 ```
 
@@ -30,4 +31,11 @@ npm run dev
 6. Randevu takvimi (istasyon çakışması)
 7. Kasa, giderler, usta primi
 8. Bakım hatırlatmaları
-9. Android kabuğu (Capacitor) ve yasal metinler
+9. ✓ Android kabuğu (Capacitor) ve yasal metinler
+
+### Mobil (Capacitor)
+
+```bash
+npm run cap:sync    # Web varlıklarını ve eklentileri Android projesine eşitler
+npm run cap:open    # Android Studio'yu açar
+```

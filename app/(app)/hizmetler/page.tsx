@@ -29,7 +29,7 @@ export default async function ServicesPage() {
   ) as Record<VehicleSegment, number>;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pt-6 md:px-8">
+    <div className="mx-auto max-w-7xl px-4 pt-6 md:px-8">
       <ServicesEditor
         canEdit={canManage(user.role)}
         multipliers={factor}

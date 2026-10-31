@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Award, ChevronRight } from "lucide-react";
 import { Plate } from "@/components/plate";
 import { Card } from "@/components/ui";
 import { prisma } from "@/lib/db";
@@ -105,11 +107,20 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
 
       {warranties.length > 0 && (
         <Card className="space-y-3 border-accent/60 p-4">
-          <div>
-            <h2 className="font-display text-lg font-semibold">Garanti belgesi</h2>
-            <p className="text-xs text-muted">
-              {formatPlate(order.vehicle.plate)} · {order.number}
-            </p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Garanti belgesi</h2>
+              <p className="text-xs text-muted">
+                {formatPlate(order.vehicle.plate)} · {order.number}
+              </p>
+            </div>
+            <Link
+              href={`/t/${token}/sertifika`}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-3 py-1.5 text-xs font-semibold text-accent-ink transition hover:bg-accent-hover"
+            >
+              <Award className="h-3.5 w-3.5" />
+              Sertifikayı Gör
+            </Link>
           </div>
           <ul className="space-y-2">
             {warranties.map((w) => (
@@ -122,6 +133,16 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
               </li>
             ))}
           </ul>
+          <Link
+            href={`/t/${token}/sertifika`}
+            className="flex items-center justify-between rounded-xl border border-line bg-raised/70 p-3 text-xs text-ink transition hover:border-accent hover:bg-raised"
+          >
+            <span className="flex items-center gap-2">
+              <Award className="h-4 w-4 text-accent" />
+              <span>Resmi Orijinallik ve Garanti Sertifikasını Aç</span>
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted" />
+          </Link>
           <p className="text-xs text-muted">Garanti koşulları {order.business.name} tarafından belirlenir.</p>
         </Card>
       )}

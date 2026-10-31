@@ -85,7 +85,7 @@ export default async function CashPage({ searchParams }: { searchParams: Promise
   const categories = Object.entries(r.byCategory).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-4 px-4 pt-6 md:px-8">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 pt-6 md:px-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="font-display text-[28px] font-bold">Kasa</h1>
         <nav aria-label="Dönem" className="flex rounded-xl border border-line bg-sunken p-1">

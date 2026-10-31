@@ -34,7 +34,12 @@ export async function startSession(session: Session) {
 }
 
 export async function endSession() {
-  (await cookies()).delete(COOKIE);
+  try {
+    (await cookies()).delete(COOKIE);
+  } catch {
+    // Next.js restricts cookie deletion to Server Actions or Route Handlers;
+    // ignore if called from a read-only Server Component context.
+  }
 }
 
 export async function readSession(): Promise<Session | null> {
@@ -48,15 +53,36 @@ export async function readSession(): Promise<Session | null> {
   }
 }
 
+/** Returns the active user if session is valid and user exists in database, otherwise clears cookie */
+export async function getCurrentUser() {
+  const session = await readSession();
+  if (!session) return null;
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        businessId: true,
+        business: { select: { id: true, name: true } },
+      },
+    });
+    if (!user || !user.isActive || user.businessId !== session.businessId) {
+      return null;
+    }
+    return user;
+  } catch {
+    return null;
+  }
+}
+
 /** The signed-in user for an app page; sends anyone else to sign in */
 export async function requireUser() {
-  const session = await readSession();
-  if (!session) redirect("/");
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { id: true, name: true, role: true, isActive: true, businessId: true, business: { select: { id: true, name: true } } },
-  });
-  if (!user || !user.isActive || user.businessId !== session.businessId) redirect("/");
+  const user = await getCurrentUser();
+  if (!user) redirect("/");
   return user;
 }
 

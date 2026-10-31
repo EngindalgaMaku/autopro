@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Semi_Condensed, Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter", display: "swap" });
@@ -18,27 +19,51 @@ const barlowCondensed = Barlow_Semi_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: { default: "AutoPro", template: "%s · AutoPro" },
-  description: "Detailing ve oto kuaför atölyeleri için araç kabul, hasar kaydı, atölye panosu ve kasa.",
+  title: { default: "AutoPro · Profesyonel Detailing Yönetimi", template: "%s · AutoPro" },
+  description: "Detailing ve oto kuaför atölyeleri için profesyonel araç kabul, hasar diyagramı, iş takibi ve kasa.",
   applicationName: "AutoPro",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "AutoPro",
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111317",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0e14" },
+  ],
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" className={`${inter.variable} ${barlow.variable} ${barlowCondensed.variable}`}>
-      <body className="min-h-dvh antialiased">
-        {children}
-        <Toaster
-          theme="dark"
-          position="top-center"
-          toastOptions={{ style: { background: "#22262e", border: "1px solid #2e333c", color: "#f3f4f6" } }}
-        />
+    <html
+      lang="tr"
+      suppressHydrationWarning
+      className={`${inter.variable} ${barlow.variable} ${barlowCondensed.variable}`}
+    >
+      <body className="min-h-dvh antialiased bg-ground text-ink selection:bg-accent/30 selection:text-accent">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={true}
+          disableTransitionOnChange={false}
+        >
+          {children}
+          <Toaster
+            position="top-right"
+            richColors
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,0 +1,18 @@
+{
+  "name": "AutoPro · Detailing & Oto Kuaför Yönetimi",
+  "short_name": "AutoPro",
+  "description": "Profesyonel detailing ve oto kuaför atölyeleri için araç kabul, hasar kaydı ve iş takibi.",
+  "start_url": "/bugun",
+  "display": "standalone",
+  "background_color": "#0b0e14",
+  "theme_color": "#0b0e14",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

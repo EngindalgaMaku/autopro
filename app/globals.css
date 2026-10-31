@@ -1,36 +1,92 @@
 @import "tailwindcss";
 
-/* AutoPro look: graphite ground, one signal-amber accent. Green only means ready / paid and
-   red only late / damage, so colour always carries meaning. The app is dark by design (wet,
-   bright workshop light; premium detailing feel), not a theme toggle. */
-@theme {
-  --color-ground: #111317;
-  --color-surface: #1a1d23;
-  --color-raised: #22262e;
-  --color-sunken: #16191e;
-  --color-line: #2e333c;
-  --color-line-strong: #5b6270;
-  --color-ink: #f3f4f6;
-  --color-muted: #a3aab5;
-  --color-accent: #ffb020;
-  --color-accent-hover: #ffc94d;
-  --color-accent-ink: #1a1300;
-  --color-ready: #34d399;
-  --color-danger: #f87171;
-  --color-plate-blue: #1f4fd8;
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *, .dark, .dark *));
+
+:root {
+  /* LaundryPro Light Mode: Clean White, Modern Slate, Amber & Sapphire Accents */
+  --color-ground: #f8fafc;
+  --color-sunken: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-raised: #f1f5f9;
+  --color-overlay: #e2e8f0;
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-accent: #f59e0b;
+  --color-accent-hover: #d97706;
+  --color-accent-ink: #ffffff;
+  --color-ready: #10b981;
+  --color-ready-bg: #ecfdf5;
+  --color-info: #0284c7;
+  --color-info-bg: #f0f9ff;
+  --color-danger: #ef4444;
+  --color-danger-bg: #fef2f2;
+  --color-plate-blue: #1d4ed8;
 
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-barlow), var(--font-inter), sans-serif;
   --font-plate: var(--font-barlow-condensed), var(--font-barlow), sans-serif;
 
-  --radius-card: 14px;
+  --radius-card: 16px;
 }
 
-/* Base rules sit in the base layer so utility classes (text-lg, font sizes on inputs) win */
+.dark {
+  /* Obsidian & Titanium Detailing Dark Mode */
+  --color-ground: #0b0e14;
+  --color-sunken: #10141d;
+  --color-surface: #171c26;
+  --color-raised: #212836;
+  --color-overlay: #293244;
+  --color-line: #2b3447;
+  --color-line-strong: #424e68;
+  --color-ink: #f8fafc;
+  --color-muted: #94a3b8;
+  --color-accent: #ffb020;
+  --color-accent-hover: #ffc94d;
+  --color-accent-ink: #140d00;
+  --color-ready: #34d399;
+  --color-ready-bg: #064e3b;
+  --color-info: #38bdf8;
+  --color-info-bg: #0c4a6e;
+  --color-danger: #f87171;
+  --color-danger-bg: #450a0a;
+  --color-plate-blue: #1d4ed8;
+}
+
+@theme {
+  --color-ground: var(--color-ground);
+  --color-sunken: var(--color-sunken);
+  --color-surface: var(--color-surface);
+  --color-raised: var(--color-raised);
+  --color-overlay: var(--color-overlay);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+  --color-ink: var(--color-ink);
+  --color-muted: var(--color-muted);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-ink: var(--color-accent-ink);
+  --color-ready: var(--color-ready);
+  --color-ready-bg: var(--color-ready-bg);
+  --color-info: var(--color-info);
+  --color-info-bg: var(--color-info-bg);
+  --color-danger: var(--color-danger);
+  --color-danger-bg: var(--color-danger-bg);
+  --color-plate-blue: var(--color-plate-blue);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-barlow), var(--font-inter), sans-serif;
+  --font-plate: var(--font-barlow-condensed), var(--font-barlow), sans-serif;
+
+  --radius-card: 16px;
+}
+
 @layer base {
   html {
-    color-scheme: dark;
     background: var(--color-ground);
+    color: var(--color-ink);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   body {
@@ -38,31 +94,67 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  /* Keyboard focus stays visible on the dark ground */
   :focus-visible {
-    outline: 3px solid var(--color-accent);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
 
   input,
   select,
   textarea {
-    font-size: 16px; /* below 16px mobile browsers zoom into the field */
+    font-size: 16px;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ground);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted);
   }
 }
 
-/* Showcase slide change on the sign-in page */
-@keyframes fade {
+/* Micro animations */
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: scale(0.97);
   }
   to {
     opacity: 1;
-    transform: none;
+    transform: scale(1);
   }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -71,5 +163,31 @@
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    color-scheme: light !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .receipt-thermal {
+    width: 78mm !important;
+    max-width: 78mm !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    font-size: 11px !important;
+    color: #000 !important;
+  }
+  @page {
+    size: auto;
+    margin: 6mm;
   }
 }

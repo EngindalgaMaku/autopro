@@ -21,7 +21,16 @@ export function ReminderActions({ id, href }: { id: string; href: string }) {
       <a href={href} target="_blank" rel="noreferrer" onClick={() => close("SENT")} className={buttonStyles({ size: "sm" })}>
         WhatsApp gönder
       </a>
-      <button type="button" disabled={pending} onClick={() => close("DISMISSED")} className={buttonStyles({ size: "sm", variant: "secondary" })}>
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => {
+          if (window.confirm("Bu hatırlatmayı listeden kaldırmak istediğinize emin misiniz?")) {
+            close("DISMISSED");
+          }
+        }}
+        className={buttonStyles({ size: "sm", variant: "secondary" })}
+      >
         Listeden çıkar
       </button>
     </div>

@@ -50,7 +50,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
   const debt = orders.reduce((s, o) => s + Math.max(0, Number(o.totalAmount) - o.payments.reduce((p, x) => p + Number(x.amount), 0)), 0);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4 px-4 pt-6 md:px-8">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 pt-6 md:px-8">
       <Link href="/musteriler" className="inline-flex h-11 items-center gap-1.5 text-sm text-muted hover:text-ink">
         <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Müşteriler
       </Link>

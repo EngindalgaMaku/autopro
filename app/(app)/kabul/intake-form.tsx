@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { AlertTriangle, Check, CheckCircle2, Loader2, MessageCircle, Plus } from "lucide-react";
+import { AlertTriangle, Check, CheckCircle2, Loader2, MessageCircle, Plus, Printer } from "lucide-react";
 import type { PaymentMethod, ServiceKind, VehicleSegment } from "@prisma/client";
 import { Plate } from "@/components/plate";
 import { Button, buttonStyles, Card, Eyebrow, Field, Input } from "@/components/ui";
@@ -360,6 +360,14 @@ export function IntakeForm({
             <MessageCircle className="h-5 w-5" aria-hidden="true" />
             Takip bağlantısını WhatsApp&apos;tan gönder
           </a>
+          <Link
+            href={`/is/${done.id}/yazdir`}
+            target="_blank"
+            className={buttonStyles({ variant: "secondary", size: "lg", className: "w-full" })}
+          >
+            <Printer className="h-5 w-5 text-accent" aria-hidden="true" />
+            Kabul Fişini Yazdır (A4)
+          </Link>
           <Button variant="secondary" size="lg" className="w-full" onClick={reset}>
             <Plus className="h-5 w-5" aria-hidden="true" />
             Yeni araç kabul
@@ -376,7 +384,7 @@ export function IntakeForm({
     <div className="mx-auto max-w-6xl px-4 pt-6 md:px-8">
       <header className="mb-5 flex items-end justify-between gap-3">
         <h1 className="font-display text-[28px] font-bold">Araç Kabul</h1>
-        <p className="hidden text-sm text-muted sm:block">Hasar kaydı bir sonraki sürümde</p>
+        <p className="hidden text-sm text-muted sm:block">Detaylı ekspertiz ve hasar kaydı</p>
       </header>
 
       {/* Phone: one column. Tablet: car on the left, services and payment on the right. Wide: three columns */}

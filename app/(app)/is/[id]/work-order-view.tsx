@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Ban, Check, ChevronRight, Copy, Loader2, MessageCircle, Phone, RotateCcw, Send, Trash2, Truck, Wallet } from "lucide-react";
+import { ArrowLeft, Ban, Check, ChevronRight, Copy, Loader2, MessageCircle, Phone, Printer, RotateCcw, Send, Trash2, Truck, Wallet } from "lucide-react";
 import type { PaymentMethod, WorkStage } from "@prisma/client";
 import { Plate } from "@/components/plate";
 import { Button, Card, Eyebrow, Input } from "@/components/ui";
@@ -15,6 +15,7 @@ import { formatPlate } from "@/lib/plate";
 import { BOARD_STAGES, canMove, nextStage, STAGES } from "@/lib/stages";
 import { cn } from "@/lib/utils";
 import { addPayment, assignWork, deletePayment, moveStage, type ActionResult } from "../actions";
+import { OrderReceiptDialog } from "@/components/order-receipt-dialog";
 
 interface OrderView {
   id: string;
@@ -64,6 +65,7 @@ export function WorkOrderView({
   const router = useRouter();
   const [pending, start] = useTransition();
   const [payOpen, setPayOpen] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
   const remaining = Math.max(0, Math.round((order.total - order.paid) * 100) / 100);
   const [amount, setAmount] = useState(remaining ? String(remaining).replace(".", ",") : "");
   const [method, setMethod] = useState<PaymentMethod>("CASH");
@@ -111,9 +113,28 @@ export function WorkOrderView({
 
   return (
     <div className="mx-auto max-w-5xl px-4 pt-6 md:px-8">
-      <Link href="/atolye" className="mb-3 inline-flex h-11 items-center gap-1.5 text-sm text-muted hover:text-ink">
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Atölye
-      </Link>
+      <div className="mb-3 flex items-center justify-between">
+        <Link href="/atolye" className="inline-flex h-11 items-center gap-1.5 text-sm text-muted hover:text-ink">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Atölye
+        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setReceiptOpen(true)}
+            className="inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-3.5 text-xs font-semibold text-ink shadow-sm transition hover:border-accent/60 hover:bg-raised"
+          >
+            <Printer className="h-4 w-4 text-accent" aria-hidden="true" />
+            Fiş & Etiket Yazdır
+          </button>
+          <Link
+            href={`/is/${order.id}/yazdir`}
+            target="_blank"
+            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-line bg-surface px-3 text-xs text-muted hover:text-ink hover:bg-raised"
+          >
+            A4
+          </Link>
+        </div>
+      </div>
 
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2">
@@ -402,6 +423,29 @@ export function WorkOrderView({
           </div>
         </div>
       )}
+      {/* Thermal POS, Key Tag & A4 Print Dialog */}
+      <OrderReceiptDialog
+        open={receiptOpen}
+        onOpenChange={setReceiptOpen}
+        order={{
+          id: order.id,
+          number: order.number,
+          trackingToken: order.trackingToken,
+          plate: order.plate,
+          car: order.car,
+          customerName: order.customerName,
+          customerPhone: order.customerPhone,
+          businessName: businessName,
+          technician: technicians.find((t) => t.id === order.technicianId)?.name ?? null,
+          station: stations.find((s) => s.id === order.stationId)?.name ?? null,
+          createdAt: order.events[0]?.at || new Date().toISOString(),
+          promisedAt: order.promisedAt,
+          total: order.total,
+          paid: order.paid,
+          remaining: remaining,
+          items: order.items,
+        }}
+      />
     </div>
   );
 }
