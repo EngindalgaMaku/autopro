@@ -16,6 +16,11 @@ if (push.status !== 0) {
   console.error("[start] prisma db push did not complete; starting with the current schema");
 }
 
+if (process.env.AUTO_SEED === "true") {
+  console.log("[start] AUTO_SEED=true algılandı, demo verileri yükleniyor...");
+  run(["npx", "tsx", "prisma/seed.ts"], spawnSync);
+}
+
 const next = run(["npx", "next", "start", ...process.argv.slice(2)], spawn);
 for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => next.kill(signal));
 next.on("exit", (code) => process.exit(code ?? 0));
