@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Semi_Condensed, Inter } from "next/font/google";
-import { Toaster } from "sonner";
+import { MobileShell } from "@/components/mobile-shell";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -59,10 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           disableTransitionOnChange={false}
         >
           {children}
-          <Toaster
-            position="top-right"
-            richColors
-          />
+          <MobileShell />
         </ThemeProvider>
       </body>
     </html>

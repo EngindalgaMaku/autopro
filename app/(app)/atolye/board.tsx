@@ -34,7 +34,7 @@ function Card({ c, compact }: { c: BoardCard; compact?: boolean }) {
     >
       <div className="flex items-center justify-between gap-2">
         <Plate plate={c.plate} size={compact ? "xs" : "sm"} />
-        {c.valet && <span className="rounded-full bg-raised px-2 py-0.5 text-xs text-accent">Vale yolda</span>}
+        {c.valet && <span className="rounded-full bg-raised px-2 py-0.5 text-xs text-accent-strong">Vale yolda</span>}
       </div>
       {c.car && <p className="truncate font-semibold">{c.car}</p>}
       <p className="line-clamp-2 text-sm text-muted">{c.work}</p>
@@ -65,7 +65,7 @@ export function Board({ cards, columns }: { cards: BoardCard[]; columns: Array<{
   if (cards.length === 0) {
     return (
       <div className="rounded-card border border-dashed border-line p-10 text-center text-muted">
-        Atölyede araç yok. Yeni gelen araç için <Link href="/kabul" className="font-semibold text-accent">Araç Kabul</Link>.
+        Atölyede araç yok. Yeni gelen araç için <Link href="/kabul" className="font-semibold text-accent-strong">Araç Kabul</Link>.
       </div>
     );
   }

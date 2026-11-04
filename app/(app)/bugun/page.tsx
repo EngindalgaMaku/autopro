@@ -201,11 +201,11 @@ export default async function TodayPage() {
       {unpricedServices > 0 && (
         <Card className="flex items-center justify-between gap-4 border-amber-500/50 bg-amber-500/10 p-4">
           <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400 font-bold">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-800 dark:text-amber-400 font-bold">
               !
             </span>
             <p className="text-xs sm:text-sm text-ink">
-              <span className="font-semibold text-amber-400">
+              <span className="font-semibold text-amber-800 dark:text-amber-400">
                 {unpricedServices} hizmetin fiyatı girilmedi.
               </span>{" "}
               <span className="text-muted">Araç kabulünde fiyatlar bu listeden gelir.</span>
@@ -232,7 +232,7 @@ export default async function TodayPage() {
           <Card className="p-4 transition-all hover:border-line-strong hover:bg-raised/40">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted">İçerideki Araçlar</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-raised text-muted group-hover:text-accent">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-raised text-muted group-hover:text-accent-strong">
                 <Car className="h-4 w-4" />
               </span>
             </div>
@@ -294,12 +294,12 @@ export default async function TodayPage() {
           <Card className="p-4 transition-all hover:border-accent/40 hover:bg-raised/40">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted">Bugünkü Randevu</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-raised text-muted group-hover:text-accent">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-raised text-muted group-hover:text-accent-strong">
                 <CalendarDays className="h-4 w-4" />
               </span>
             </div>
             <div className="mt-2 flex items-baseline justify-between">
-              <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-accent">
+              <p className="font-display text-2xl sm:text-3xl font-bold tabular-nums text-accent-strong">
                 {appointments.length}
               </p>
               <Badge variant="primary" className="text-[11px]">
@@ -328,7 +328,7 @@ export default async function TodayPage() {
             <Eyebrow>Bugünkü Randevu Akışı</Eyebrow>
             <Link
               href="/randevular"
-              className="text-xs font-semibold text-accent hover:underline"
+              className="text-xs font-semibold text-accent-strong hover:underline"
             >
               Takvimi Aç &rarr;
             </Link>
@@ -351,7 +351,7 @@ export default async function TodayPage() {
                   >
                     <span
                       className={`w-14 font-display text-lg font-bold tabular-nums ${
-                        i === nextIndex ? "text-accent" : "text-ink"
+                        i === nextIndex ? "text-accent-strong" : "text-ink"
                       }`}
                     >
                       {time(a.startsAt)}

@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand";
+import { useEscape } from "@/lib/use-escape";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/app/(auth)/actions";
 import { QRScannerDialog } from "@/components/qr-scanner-dialog";
@@ -56,20 +57,20 @@ const MOBILE_ITEMS = [
 
 const ROLE_CONFIG: Record<string, { label: string; badgeClass: string }> = {
   OWNER: {
-    label: "Yönetici",
-    badgeClass: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/25",
+    label: "İşletme Sahibi",
+    badgeClass: "bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/25",
   },
   MANAGER: {
-    label: "Müdür",
-    badgeClass: "bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/25",
+    label: "Yönetici",
+    badgeClass: "bg-sky-500/15 text-sky-700 dark:text-sky-400 border border-sky-500/25",
   },
   TECHNICIAN: {
     label: "Usta",
-    badgeClass: "bg-accent/15 text-accent border border-accent/25",
+    badgeClass: "bg-accent/15 text-accent-strong border border-accent/25",
   },
   VALET: {
     label: "Vale",
-    badgeClass: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25",
+    badgeClass: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25",
   },
 };
 
@@ -81,6 +82,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  useEscape(mobileMenuOpen, () => setMobileMenuOpen(false));
 
   useEffect(() => {
     setMounted(true);
@@ -110,7 +112,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
   return (
     <>
       {/* Mobil Üst Bar */}
-      <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-sunken/95 px-4 backdrop-blur md:hidden">
+      <header className="no-print fixed inset-x-0 top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between border-b border-line bg-sunken/95 px-4 backdrop-blur md:hidden pt-[env(safe-area-inset-top)]">
         <Link href="/bugun" className="flex items-center gap-2">
           <BrandMark withName={true} />
         </Link>
@@ -120,7 +122,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
             type="button"
             onClick={() => setScannerOpen(true)}
             aria-label="QR / Barkod tara"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-accent transition hover:bg-raised"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-accent-strong transition hover:bg-raised"
           >
             <QrCode className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -137,7 +139,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
 
       {/* Mobil Slide-over Menü (Çekmece) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div role="dialog" aria-modal="true" aria-label="Menü" className="fixed inset-0 z-50 md:hidden">
           {/* Karartma Katmanı */}
           <div
             className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
@@ -146,7 +148,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
           />
 
           {/* Menü Paneli */}
-          <div className="fixed inset-y-0 left-0 flex w-[280px] flex-col border-r border-line bg-sunken p-4 shadow-2xl">
+          <div className="fixed inset-y-0 left-0 flex w-[280px] flex-col border-r border-line bg-sunken p-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl">
             <div className="flex items-center justify-between border-b border-line pb-3">
               <BrandMark withName={true} />
               <button
@@ -161,7 +163,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
 
             {/* Kullanıcı Kartı */}
             <div className="my-3 flex items-center gap-3 rounded-xl border border-line bg-surface p-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-accent/30 bg-accent/10 font-bold text-accent shadow-sm">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-accent/30 bg-accent/10 font-bold text-accent-strong shadow-sm">
                 {initial}
               </div>
               <div className="min-w-0 flex-1">
@@ -205,7 +207,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
                       active ? "border border-line bg-raised font-semibold text-ink" : "text-muted hover:bg-raised/70 hover:text-ink"
                     )}
                   >
-                    <Icon className={cn("h-5 w-5 shrink-0", active ? "text-accent" : "")} aria-hidden="true" />
+                    <Icon className={cn("h-5 w-5 shrink-0", active ? "text-accent-strong" : "")} aria-hidden="true" />
                     <span className="truncate">{label}</span>
                   </Link>
                 );
@@ -231,7 +233,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
       {/* Mobil Alt Menü */}
       <nav
         aria-label="Mobil ana menü"
-        className="fixed inset-x-0 bottom-0 z-40 grid h-[72px] grid-cols-5 items-center border-t border-line bg-sunken pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="no-print hide-on-keyboard fixed inset-x-0 bottom-0 z-40 grid h-[calc(72px+env(safe-area-inset-bottom))] grid-cols-5 items-center border-t border-line bg-sunken pb-[env(safe-area-inset-bottom)] md:hidden"
       >
         {MOBILE_ITEMS.map(({ href, label, icon: Icon, ...rest }) => {
           const active = isActive(pathname, href);
@@ -254,7 +256,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex flex-col items-center gap-1 text-[11px] transition-colors",
-                active ? "font-semibold text-accent" : "text-muted hover:text-ink"
+                active ? "font-semibold text-accent-strong" : "text-muted hover:text-ink"
               )}
             >
               <Icon className="h-[22px] w-[22px]" aria-hidden="true" />
@@ -268,7 +270,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
       <aside
         aria-label="Sol menü"
         className={cn(
-          "sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-sunken transition-[width] duration-200 ease-in-out md:flex",
+          "no-print sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-sunken transition-[width] duration-200 ease-in-out md:flex",
           collapsed ? "w-20 p-3" : "w-64 p-4"
         )}
       >
@@ -340,7 +342,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
                     : "text-muted hover:bg-raised/70 hover:text-ink"
                 )}
               >
-                <Icon className={cn("h-5 w-5 shrink-0", active ? "text-accent" : "")} aria-hidden="true" />
+                <Icon className={cn("h-5 w-5 shrink-0", active ? "text-accent-strong" : "")} aria-hidden="true" />
                 {!collapsed && <span className="truncate">{label}</span>}
               </Link>
             );
@@ -358,7 +360,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
               collapsed ? "justify-center px-0" : "px-3"
             )}
           >
-            <QrCode className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
+            <QrCode className="h-5 w-5 shrink-0 text-accent-strong" aria-hidden="true" />
             {!collapsed && <span className="truncate">Barkod / QR Tara</span>}
           </button>
         </div>
@@ -369,7 +371,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
             <div className="flex flex-col items-center gap-2">
               <div
                 title={`${cleanName} (${roleInfo.label})`}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 border border-accent/30 text-sm font-bold text-accent shadow-sm"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 border border-accent/30 text-sm font-bold text-accent-strong shadow-sm"
               >
                 {initial}
               </div>
@@ -387,7 +389,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
           ) : (
             <div className="space-y-3">
               <div className="flex items-center gap-3 px-1">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 border border-accent/30 text-sm font-bold text-accent shadow-sm">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 border border-accent/30 text-sm font-bold text-accent-strong shadow-sm">
                   {initial}
                 </div>
                 <div className="min-w-0 flex-1">

@@ -6,6 +6,7 @@ import { VehicleDiagram } from "@/components/vehicle-diagram";
 import { formatTL } from "@/lib/money";
 import { formatPhone } from "@/lib/phone";
 import { formatPlate } from "@/lib/plate";
+import { printPage } from "@/lib/print";
 import { DAMAGE_KINDS, PANELS, PART_LABELS } from "@/lib/vehicle-parts";
 
 export interface PrintWorkOrderData {
@@ -69,9 +70,7 @@ export interface PrintWorkOrderData {
 export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
   const { order, vehicle, customer, business, items, marks, readings, qrDataUrl, trackUrl } = data;
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => printPage(`İş emri ${order.number}`);
 
   const beforeReadings = new Map(readings.filter((r) => r.phase === "BEFORE").map((r) => [r.part, r.microns]));
   const afterReadings = new Map(readings.filter((r) => r.phase === "AFTER").map((r) => [r.part, r.microns]));
@@ -142,7 +141,7 @@ export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={qrDataUrl} alt="Takip QR" className="h-16 w-16 rounded border border-slate-300 p-0.5" />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded border border-slate-300 text-slate-400">
+              <div className="flex h-16 w-16 items-center justify-center rounded border border-slate-300 text-slate-500">
                 <QrCode className="h-8 w-8" />
               </div>
             )}
@@ -309,7 +308,7 @@ export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
           <div className="border-t border-slate-900 pt-1 text-center">
             <p className="font-bold text-slate-900 text-xs">Aracı Teslim Eden (Müşteri)</p>
             <p className="text-[11px] text-slate-600 mt-0.5">{customer.name}</p>
-            <div className="mt-8 border-b border-dashed border-slate-300 pb-1 text-[10px] text-slate-400">
+            <div className="mt-8 border-b border-dashed border-slate-300 pb-1 text-[10px] text-slate-500">
               İmza
             </div>
           </div>
@@ -317,7 +316,7 @@ export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
           <div className="border-t border-slate-900 pt-1 text-center">
             <p className="font-bold text-slate-900 text-xs">Aracı Teslim Alan (Atölye / Detailer)</p>
             <p className="text-[11px] text-slate-600 mt-0.5">{business.name}</p>
-            <div className="mt-8 border-b border-dashed border-slate-300 pb-1 text-[10px] text-slate-400">
+            <div className="mt-8 border-b border-dashed border-slate-300 pb-1 text-[10px] text-slate-500">
               Kaşe / İmza
             </div>
           </div>
@@ -326,7 +325,7 @@ export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
         {/* Footer Info */}
         <div className="mt-4 border-t border-slate-200 pt-2 flex items-center justify-between text-[9px] text-slate-500">
           <span>Takip: {trackUrl}</span>
-          <span>Basım: {new Date().toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" })}</span>
+          <span suppressHydrationWarning>Basım: {new Date().toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" })}</span>
         </div>
       </div>
     </div>

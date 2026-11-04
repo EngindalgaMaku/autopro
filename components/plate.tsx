@@ -16,7 +16,7 @@ export function Plate({ plate, size = "md", className }: { plate: string; size?:
   const s = SIZES[size];
   return (
     <span
-      className={cn("inline-flex overflow-hidden border-black bg-white align-middle", s.box, className)}
+      className={cn("inline-flex shrink-0 overflow-hidden border-black bg-white align-middle", s.box, className)}
       aria-label={`Plaka ${formatPlate(plate)}`}
       role="img"
     >

@@ -31,8 +31,8 @@ export default function SignUpPage() {
         <label className="flex items-start gap-3 text-sm text-muted">
           <input type="checkbox" name="terms" className="mt-0.5 h-5 w-5 accent-[#ffb020]" defaultChecked={f.terms === "on"} />
           <span>
-            <Link href="/kullanim-sartlari" className="text-accent">Kullanım şartlarını</Link> ve{" "}
-            <Link href="/kvkk" className="text-accent">KVKK aydınlatma metnini</Link> okudum, onaylıyorum.
+            <Link href="/kullanim-sartlari" className="text-accent-strong">Kullanım şartlarını</Link> ve{" "}
+            <Link href="/kvkk" className="text-accent-strong">KVKK aydınlatma metnini</Link> okudum, onaylıyorum.
           </span>
         </label>
         <p className="text-sm text-muted">Bu bir tanıtım sürümüdür. Gerçek müşteri bilgisi girmeyin.</p>
@@ -47,7 +47,7 @@ export default function SignUpPage() {
       </form>
       <p className="mt-6 text-center text-sm text-muted">
         Hesabınız var mı?{" "}
-        <Link href="/" className="font-semibold text-accent hover:text-accent-hover">
+        <Link href="/" className="font-semibold text-accent-strong hover:text-accent-hover">
           Giriş yapın
         </Link>
       </p>

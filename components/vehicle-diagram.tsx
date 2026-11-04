@@ -49,12 +49,12 @@ export function VehicleDiagram({
   const fill = (key: string) => {
     if (selected === key) return "#ffb020";
     if (isPrint) return values[key] ? "#f1f5f9" : "#ffffff";
-    return values[key] ? "#2e333c" : "#22262e";
+    return values[key] ? "var(--diagram-panel-on)" : "var(--diagram-panel)";
   };
   const stroke = (key: string) => {
     if (selected === key) return "#ffc94d";
     if (isPrint) return "#334155";
-    return "#5b6270";
+    return "var(--diagram-stroke)";
   };
 
   // Several marks on one panel fan out around its centre
@@ -76,7 +76,7 @@ export function VehicleDiagram({
     >
       {WHEELS.map((w) => (
         <g key={w.key} {...props(w.key)}>
-          <rect x={w.x} y={w.y} width={w.w} height={w.h} rx={5} fill={selected === w.key ? "#ffb020" : isPrint ? "#475569" : "#5b6270"} />
+          <rect x={w.x} y={w.y} width={w.w} height={w.h} rx={5} fill={selected === w.key ? "#ffb020" : isPrint ? "#475569" : "var(--diagram-wheel)"} />
         </g>
       ))}
       {PANELS.map((p) => (
@@ -89,7 +89,7 @@ export function VehicleDiagram({
               textAnchor="middle"
               fontSize={p.w < 40 ? 11 : 15}
               fontWeight={700}
-              fill={selected === p.key ? "#1a1300" : isPrint ? "#0f172a" : "#f3f4f6"}
+              fill={selected === p.key ? "#1a1300" : isPrint ? "#0f172a" : "var(--diagram-text)"}
               fontFamily="var(--font-barlow), sans-serif"
             >
               {values[p.key]}
@@ -99,12 +99,12 @@ export function VehicleDiagram({
       ))}
       {GLASS.map((g) => (
         <g key={g.key} {...props(g.key)}>
-          <path d={g.d} fill={selected === g.key ? "#ffb020" : isPrint ? "#e2e8f0" : "#16191e"} stroke={stroke(g.key)} strokeWidth={isPrint ? 1.5 : 2} />
+          <path d={g.d} fill={selected === g.key ? "#ffb020" : isPrint ? "#e2e8f0" : "var(--diagram-glass)"} stroke={stroke(g.key)} strokeWidth={isPrint ? 1.5 : 2} />
         </g>
       ))}
       {placed.map((m) => (
         <g key={m.number} aria-hidden="true" pointerEvents="none">
-          <circle cx={m.cx} cy={m.cy} r={10} fill={isPrint ? "#dc2626" : "#f87171"} stroke={isPrint ? "#ffffff" : "#111317"} strokeWidth={1.5} />
+          <circle cx={m.cx} cy={m.cy} r={10} fill={isPrint ? "#dc2626" : "var(--diagram-mark)"} stroke={isPrint ? "#ffffff" : "var(--diagram-mark-ring)"} strokeWidth={1.5} />
           <text x={m.cx} y={m.cy + 4} textAnchor="middle" fontSize={11} fontWeight={700} fill="#ffffff" fontFamily="var(--font-inter), sans-serif">
             {m.number}
           </text>

@@ -10,6 +10,8 @@ import { StationsManager } from "./stations-manager";
 export const metadata = { title: "Ayarlar" };
 export const dynamic = "force-dynamic";
 
+const ROLE_LABELS: Record<string, string> = { OWNER: "İşletme Sahibi", MANAGER: "Yönetici", TECHNICIAN: "Detailing Ustası", VALET: "Vale" };
+
 export default async function SettingsPage() {
   const user = await requireUser();
   const business = await prisma.business.findUnique({
@@ -34,7 +36,7 @@ export default async function SettingsPage() {
       {/* Hızlı Kısayol Kartları */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Link href="/hizmetler" className="flex items-center gap-3.5 rounded-2xl border border-line bg-surface p-4 transition-colors hover:border-line-strong hover:bg-raised/40">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent-strong">
             <Sparkles className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -101,7 +103,7 @@ export default async function SettingsPage() {
               </div>
               <div>
                 <span className="text-xs text-muted block">Rol</span>
-                <span className="font-medium text-accent">{user.role}</span>
+                <span className="font-medium text-accent-strong">{ROLE_LABELS[user.role] ?? user.role}</span>
               </div>
             </div>
           </Card>

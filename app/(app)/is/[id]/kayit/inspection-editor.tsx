@@ -257,7 +257,7 @@ export function InspectionEditor({
                       {(part && partMarks.length ? partMarks : marks).map((m) => (
                         <li key={m.id} className="space-y-2 rounded-xl bg-raised p-3">
                           <div className="flex items-start gap-3">
-                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-danger text-sm font-bold text-[#1a0a0a]">{m.number}</span>
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-danger text-sm font-bold text-danger-ink">{m.number}</span>
                             <span className="min-w-0 flex-1">
                               <span className="block font-medium">
                                 {PART_LABELS[m.part]} · {DAMAGE_KINDS[m.kind]}

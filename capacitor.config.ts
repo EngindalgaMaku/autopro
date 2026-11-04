@@ -1,27 +1,29 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
+// The Android app loads the deployed site; server actions cannot be bundled. For the emulator
+// against a local server: `CAPACITOR_SERVER_URL=http://localhost:3100 npm run cap:sync` with
+// `adb reverse tcp:3100 tcp:3100` (localhost keeps the secure session cookie and the camera).
+const serverUrl = process.env.CAPACITOR_SERVER_URL || "https://autopro.kodleon.com";
+
 const config: CapacitorConfig = {
   appId: "com.autopro.app",
   appName: "AutoPro",
-  webDir: "public",
+  webDir: "capacitor/www",
   server: {
-    // Geliştirme aşamasında (emülatör için 10.0.2.2:3000, gerçek cihaz için yerel IP)
-    // veya canlı ortam URL'si belirtilebilir.
-    url: process.env.CAPACITOR_SERVER_URL,
-    cleartext: true,
+    url: serverUrl,
+    cleartext: serverUrl.startsWith("http://"),
+    errorPath: "offline.html",
   },
   android: {
-    backgroundColor: "#0e1117",
-    allowMixedContent: true,
+    backgroundColor: "#0b0e14",
   },
   plugins: {
+    // The site hides the splash once it loads; the timeout covers pages that never do
     SplashScreen: {
-      launchShowDuration: 1200,
-      backgroundColor: "#0e1117",
+      launchAutoHide: true,
+      launchShowDuration: 2000,
+      backgroundColor: "#0b0e14",
       showSpinner: false,
-    },
-    StatusBar: {
-      backgroundColor: "#0e1117",
     },
   },
 };

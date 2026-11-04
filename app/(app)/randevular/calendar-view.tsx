@@ -25,6 +25,7 @@ import { Plate } from "@/components/plate";
 import { Button, Card, Field, Input } from "@/components/ui";
 import { formatPhone } from "@/lib/phone";
 import { cn } from "@/lib/utils";
+import { useEscape } from "@/lib/use-escape";
 import { deleteAppointment, saveAppointment, setAppointmentStatus, type AppointmentResult } from "./actions";
 
 export interface CalendarAppointment {
@@ -58,7 +59,7 @@ interface ServiceQuickOption {
 const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 
 const STATUS_MAP: Record<AppointmentStatus, { label: string; bg: string; text: string; border: string }> = {
-  BOOKED: { label: "Bekleniyor", bg: "bg-accent/15", text: "text-accent", border: "border-accent/40" },
+  BOOKED: { label: "Bekleniyor", bg: "bg-accent/15", text: "text-accent-strong", border: "border-accent/40" },
   ARRIVED: { label: "Geldi", bg: "bg-ready/15", text: "text-ready", border: "border-ready/40" },
   CANCELLED: { label: "İptal", bg: "bg-danger/10", text: "text-danger", border: "border-danger/30" },
   NO_SHOW: { label: "Gelmedi", bg: "bg-zinc-500/15", text: "text-zinc-400", border: "border-zinc-500/30" },
@@ -78,6 +79,7 @@ export function CalendarView({
   const router = useRouter();
   const [viewMode, setViewMode] = useState<"timeline" | "list">("timeline");
   const [modalOpen, setModalOpen] = useState(false);
+  useEscape(modalOpen, () => setModalOpen(false));
   const [editingApp, setEditingApp] = useState<CalendarAppointment | null>(null);
   const [selectedStation, setSelectedStation] = useState<string>("");
   const [startTime, setStartTime] = useState("10:00");
@@ -269,7 +271,7 @@ export function CalendarView({
                       type="button"
                       title={`${st.name} için randevu ekle`}
                       onClick={() => openNewModal(st.id)}
-                      className="text-muted hover:text-accent p-0.5 rounded"
+                      className="text-muted hover:text-accent-strong p-0.5 rounded"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -525,11 +527,11 @@ export function CalendarView({
       {/* 3. YENİ / DÜZENLEME MODALI */}
       {/* ============================================================ */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
+        <div role="dialog" aria-modal="true" aria-label="Randevu" className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
           <Card className="w-full max-w-lg p-6 border-accent/60 bg-surface shadow-2xl relative max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-line">
               <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-accent" />
+                <Calendar className="h-5 w-5 text-accent-strong" />
                 <h2 className="font-display text-lg font-bold text-ink">
                   {editingApp ? "Randevuyu Güncelle" : "Yeni Randevu Oluştur"}
                 </h2>

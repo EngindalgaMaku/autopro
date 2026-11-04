@@ -78,13 +78,13 @@ const SEGMENT_KEYS = Object.keys(SEGMENTS) as VehicleSegment[];
 
 // Kategori Görsel Temaları (Renk ve İkonlar)
 const KIND_THEMES: Record<ServiceKind, { badgeBg: string; textColor: string; borderColor: string }> = {
-  WASH: { badgeBg: "bg-sky-500/10", textColor: "text-sky-400", borderColor: "border-sky-500/20" },
-  INTERIOR: { badgeBg: "bg-indigo-500/10", textColor: "text-indigo-400", borderColor: "border-indigo-500/20" },
-  POLISH: { badgeBg: "bg-amber-500/10", textColor: "text-amber-400", borderColor: "border-amber-500/20" },
-  CERAMIC: { badgeBg: "bg-purple-500/10", textColor: "text-purple-400", borderColor: "border-purple-500/20" },
-  PPF: { badgeBg: "bg-emerald-500/10", textColor: "text-emerald-400", borderColor: "border-emerald-500/20" },
-  WINDOW_FILM: { badgeBg: "bg-slate-500/15", textColor: "text-slate-300", borderColor: "border-slate-500/30" },
-  WHEEL: { badgeBg: "bg-orange-500/10", textColor: "text-orange-400", borderColor: "border-orange-500/20" },
+  WASH: { badgeBg: "bg-sky-500/10", textColor: "text-sky-700 dark:text-sky-400", borderColor: "border-sky-500/20" },
+  INTERIOR: { badgeBg: "bg-indigo-500/10", textColor: "text-indigo-700 dark:text-indigo-400", borderColor: "border-indigo-500/20" },
+  POLISH: { badgeBg: "bg-amber-500/10", textColor: "text-amber-800 dark:text-amber-400", borderColor: "border-amber-500/20" },
+  CERAMIC: { badgeBg: "bg-purple-500/10", textColor: "text-purple-700 dark:text-purple-400", borderColor: "border-purple-500/20" },
+  PPF: { badgeBg: "bg-emerald-500/10", textColor: "text-emerald-700 dark:text-emerald-400", borderColor: "border-emerald-500/20" },
+  WINDOW_FILM: { badgeBg: "bg-slate-500/15", textColor: "text-slate-700 dark:text-slate-300", borderColor: "border-slate-500/30" },
+  WHEEL: { badgeBg: "bg-orange-500/10", textColor: "text-orange-700 dark:text-orange-400", borderColor: "border-orange-500/20" },
   OTHER: { badgeBg: "bg-zinc-500/10", textColor: "text-zinc-400", borderColor: "border-zinc-500/20" },
 };
 
@@ -196,7 +196,7 @@ function ServiceForm({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="6.500"
-              className="font-display text-lg font-bold text-accent bg-sunken"
+              className="font-display text-lg font-bold text-accent-strong bg-sunken"
             />
           </Field>
         </div>
@@ -369,7 +369,7 @@ export function ServicesEditor({
       {/* KPI Özet Metrikleri */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card className="p-4 flex items-center gap-3.5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent-strong">
             <Wrench className="h-5 w-5" />
           </div>
           <div>
@@ -379,7 +379,7 @@ export function ServicesEditor({
         </Card>
 
         <Card className="p-4 flex items-center gap-3.5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent-strong">
             <Package className="h-5 w-5" />
           </div>
           <div>
@@ -630,13 +630,13 @@ export function ServicesEditor({
                         <div className="text-right shrink-0">
                           {s.basePrice > 0 ? (
                             <div>
-                              <span className="font-display text-xl font-bold tabular-nums text-accent">
+                              <span className="font-display text-xl font-bold tabular-nums text-accent-strong">
                                 {formatTL(s.basePrice)}
                               </span>
                               <span className="block text-[10px] text-muted">SUV: {formatTL(suvPrice)}</span>
                             </div>
                           ) : (
-                            <span className="rounded-md bg-accent/15 px-2 py-1 text-xs font-semibold text-accent">
+                            <span className="rounded-md bg-accent/15 px-2 py-1 text-xs font-semibold text-accent-strong">
                               Fiyat Girin
                             </span>
                           )}
@@ -657,7 +657,7 @@ export function ServicesEditor({
                         )}
 
                         {s.warrantyMonths && (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-purple-500/10 text-purple-400 px-2 py-0.5 border border-purple-500/20 font-medium">
+                          <span className="inline-flex items-center gap-1 rounded-md bg-purple-500/10 text-purple-700 dark:text-purple-400 px-2 py-0.5 border border-purple-500/20 font-medium">
                             <ShieldCheck className="h-3 w-3" />
                             {warrantyLabel(s.warrantyMonths)} Garanti
                           </span>
@@ -798,7 +798,7 @@ export function ServicesEditor({
                     <th className="py-3 px-3 font-semibold">Kategori</th>
                     <th className="py-3 px-3 font-semibold text-right">Sedan (1,00)</th>
                     <th className="py-3 px-3 font-semibold text-right">Hatchback ({multipliers.HATCHBACK})</th>
-                    <th className="py-3 px-3 font-semibold text-right text-accent">SUV ({multipliers.SUV})</th>
+                    <th className="py-3 px-3 font-semibold text-right text-accent-strong">SUV ({multipliers.SUV})</th>
                     <th className="py-3 px-3 font-semibold text-right">Büyük SUV ({multipliers.SUV_LARGE})</th>
                     <th className="py-3 px-3 font-semibold text-right">Ticari ({multipliers.COMMERCIAL})</th>
                   </tr>
@@ -816,7 +816,7 @@ export function ServicesEditor({
                         <td className="py-3 px-3 text-right text-muted font-mono">
                           {formatTL(Math.round(s.basePrice * multipliers.HATCHBACK))}
                         </td>
-                        <td className="py-3 px-3 text-right font-semibold text-accent font-mono">
+                        <td className="py-3 px-3 text-right font-semibold text-accent-strong font-mono">
                           {formatTL(Math.round(s.basePrice * multipliers.SUV))}
                         </td>
                         <td className="py-3 px-3 text-right text-muted font-mono">

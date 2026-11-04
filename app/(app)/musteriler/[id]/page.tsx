@@ -120,7 +120,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                     <span className="w-24 shrink-0 text-sm tabular-nums text-muted">{day(o.createdAt)}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm">{o.items.map((i) => i.name).join(", ")}</span>
-                      <span className={cn("block text-xs", o.stage === "CANCELLED" ? "text-danger" : o.stage === "DELIVERED" ? "text-muted" : "text-accent")}>
+                      <span className={cn("block text-xs", o.stage === "CANCELLED" ? "text-danger" : o.stage === "DELIVERED" ? "text-muted" : "text-accent-strong")}>
                         {STAGES[o.stage].label}
                       </span>
                     </span>

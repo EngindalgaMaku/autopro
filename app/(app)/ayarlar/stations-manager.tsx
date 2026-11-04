@@ -23,22 +23,22 @@ const STATION_TYPES: Array<{
   {
     value: "WASH_BAY",
     label: "Yıkama Peronu",
-    badgeClass: "bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30",
+    badgeClass: "bg-sky-500/15 text-sky-700 dark:text-sky-400 border-sky-500/30",
   },
   {
     value: "LIFT",
     label: "Lift Alanı",
-    badgeClass: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500/30",
+    badgeClass: "bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border-indigo-500/30",
   },
   {
     value: "DETAILING_ROOM",
     label: "Detailing & Seramik Odası",
-    badgeClass: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30",
+    badgeClass: "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30",
   },
   {
     value: "INTERIOR",
     label: "İç Detay Alanı",
-    badgeClass: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30",
+    badgeClass: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30",
   },
 ];
 

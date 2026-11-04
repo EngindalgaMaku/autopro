@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { printPage } from "@/lib/print";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Printer, Tag, Receipt, FileText, Check } from "lucide-react";
 import { Plate } from "@/components/plate";
@@ -48,20 +49,18 @@ export function OrderReceiptDialog({
 }: OrderReceiptDialogProps) {
   const [activeTab, setActiveTab] = useState<"pos" | "tag" | "a4">("pos");
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => printPage(`Fiş ${order.number}`);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl max-h-[90vh] bg-surface border-line p-6 flex flex-col">
+      <DialogContent className="print-area max-w-xl max-h-[90dvh] bg-surface border-line p-4 sm:p-6 flex flex-col">
         <DialogHeader className="no-print">
-          <DialogTitle className="flex items-center justify-between text-ink">
+          <DialogTitle className="flex flex-wrap items-center gap-2 pr-9 text-ink">
             <span className="flex items-center gap-2">
-              <Printer className="h-5 w-5 text-accent" />
+              <Printer className="h-5 w-5 text-accent-strong" />
               Yazdırma & Etiket Merkezi
             </span>
-            <Button size="sm" onClick={handlePrint} className="gap-2">
+            <Button size="sm" onClick={handlePrint} className="ml-auto gap-2">
               <Printer className="h-4 w-4" />
               Yazdır
             </Button>

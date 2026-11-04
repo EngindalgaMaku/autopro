@@ -19,9 +19,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           businessName: user.business.name,
         }}
       />
-      <main className="min-w-0 flex-1 pt-14 pb-[calc(88px+env(safe-area-inset-bottom))] md:pt-0 md:pb-10">
+      <main className="min-w-0 flex-1 pt-[calc(3.5rem+env(safe-area-inset-top))] pb-[calc(88px+env(safe-area-inset-bottom))] md:pt-0 md:pb-10 print:p-0">
         {notice && (
-          <p role="note" data-testid="demo-notice" className="border-b border-accent/30 bg-accent/10 px-4 py-2 text-center text-xs font-medium text-ink">
+          <p role="note" data-testid="demo-notice" className="no-print border-b border-accent/30 bg-accent/10 px-4 py-2 text-center text-xs font-medium text-ink">
             {notice}
           </p>
         )}

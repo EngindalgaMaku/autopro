@@ -46,7 +46,7 @@ export function AppNav({ businessName }: { businessName: string }) {
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex flex-col items-center gap-1 text-[11px]",
-                active ? "font-semibold text-accent" : "text-muted"
+                active ? "font-semibold text-accent-strong" : "text-muted"
               )}
             >
               <Icon className="h-[22px] w-[22px]" aria-hidden="true" />

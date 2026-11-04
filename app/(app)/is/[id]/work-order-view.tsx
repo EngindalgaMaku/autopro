@@ -125,7 +125,7 @@ export function WorkOrderView({
             onClick={() => setReceiptOpen(true)}
             className="inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-3.5 text-xs font-semibold text-ink shadow-sm transition hover:border-accent/60 hover:bg-raised"
           >
-            <Printer className="h-4 w-4 text-accent" aria-hidden="true" />
+            <Printer className="h-4 w-4 text-accent-strong" aria-hidden="true" />
             Fiş & Etiket Yazdır
           </button>
           <Link
@@ -145,7 +145,7 @@ export function WorkOrderView({
           <p className="font-mono text-xs text-muted">{order.number}</p>
         </div>
         <div className="text-right">
-          <p className={cn("font-display text-2xl font-bold", order.stage === "READY" ? "text-ready" : order.stage === "CANCELLED" ? "text-danger" : "text-accent")}>
+          <p className={cn("font-display text-2xl font-bold", order.stage === "READY" ? "text-ready" : order.stage === "CANCELLED" ? "text-danger" : "text-accent-strong")}>
             {STAGES[order.stage].label}
           </p>
           {order.promisedAt && !closed && <p className="text-sm text-muted">Teslim: {whenLabel(new Date(order.promisedAt))}</p>}
@@ -405,7 +405,7 @@ export function WorkOrderView({
 
       {/* The next move, always in reach above the tab bar */}
       {!closed && step && (
-        <div className="sticky bottom-[calc(72px+env(safe-area-inset-bottom))] z-30 -mx-4 mt-5 border-t border-line bg-ground/95 px-4 py-3 backdrop-blur md:bottom-0 md:mx-0">
+        <div className="hide-on-keyboard sticky bottom-[calc(72px+env(safe-area-inset-bottom))] z-30 -mx-4 mt-5 border-t border-line bg-ground/95 px-4 py-3 backdrop-blur md:bottom-0 md:mx-0">
           <div className="mx-auto flex max-w-5xl gap-2">
             {collectFirst ? (
               <Button size="lg" className="flex-1" onClick={openPay}>

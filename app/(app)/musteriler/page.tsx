@@ -93,7 +93,7 @@ export default async function CustomersPage({
       {/* KPI / Özet Kartları */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Card className="flex items-center gap-3.5 p-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent-strong">
             <Users className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
@@ -103,7 +103,7 @@ export default async function CustomersPage({
         </Card>
 
         <Card className="flex items-center gap-3.5 p-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-raised border border-line text-accent-strong">
             <Car className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>

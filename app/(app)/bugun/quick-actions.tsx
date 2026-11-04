@@ -33,7 +33,7 @@ export function QuickActionsRibbon() {
             className: "gap-2 flex-1 sm:flex-none justify-center hover:border-accent/40",
           })}
         >
-          <QrCode className="h-4 w-4 text-accent" />
+          <QrCode className="h-4 w-4 text-accent-strong" />
           <span>Barkod / QR Tara</span>
         </button>
 

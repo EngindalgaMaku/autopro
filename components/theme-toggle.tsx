@@ -36,16 +36,16 @@ export function ThemeToggle({ className }: { className?: string }) {
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={isDark ? "Açık moda geç (LaundryPro)" : "Koyu moda geç (Obsidian)"}
-      title={isDark ? "Açık moda geç (LaundryPro)" : "Koyu moda geç (Obsidian)"}
+      aria-label={isDark ? "Açık temaya geç" : "Koyu temaya geç"}
+      title={isDark ? "Açık temaya geç" : "Koyu temaya geç"}
       className={buttonStyles({
         variant: "secondary",
         size: "icon-sm",
-        className: `transition-all duration-200 hover:scale-105 hover:border-accent/50 ${className || ""}`,
+        className: `shrink-0 transition-all duration-200 hover:scale-105 hover:border-accent/50 ${className || ""}`,
       })}
     >
       {isDark ? (
-        <Sun className="h-4 w-4 text-accent transition-transform rotate-0 scale-100" />
+        <Sun className="h-4 w-4 text-accent-strong transition-transform rotate-0 scale-100" />
       ) : (
         <Moon className="h-4 w-4 text-sky-600 transition-transform rotate-0 scale-100" />
       )}

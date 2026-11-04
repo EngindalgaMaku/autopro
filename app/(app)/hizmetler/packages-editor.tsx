@@ -99,7 +99,7 @@ function PackageForm({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="Örn: 48.000"
-              className="font-display text-lg font-bold text-accent bg-sunken"
+              className="font-display text-lg font-bold text-accent-strong bg-sunken"
             />
           </Field>
         </div>
@@ -259,13 +259,13 @@ export function PackagesEditor({
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="min-w-0 flex-1">
                     <div className="inline-flex items-center gap-1.5 rounded-md bg-raised px-2 py-0.5 text-[11px] font-semibold text-muted mb-1.5">
-                      <Sparkles className="h-3 w-3 text-accent" />
+                      <Sparkles className="h-3 w-3 text-accent-strong" />
                       Paket
                     </div>
                     <h3 className="font-display text-lg font-bold text-ink leading-tight">{pkg.name}</h3>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="font-display text-2xl font-bold tabular-nums text-accent">
+                    <span className="font-display text-2xl font-bold tabular-nums text-accent-strong">
                       {formatTL(pkg.price)}
                     </span>
                     <span className="block text-[10px] text-muted uppercase">Sedan Baz Fiyat</span>
@@ -282,7 +282,7 @@ export function PackagesEditor({
                     return (
                       <div key={sid} className="flex items-center justify-between text-xs gap-2">
                         <span className="flex items-center gap-1.5 text-ink truncate">
-                          <Check className="h-3.5 w-3.5 text-accent shrink-0" strokeWidth={2.6} />
+                          <Check className="h-3.5 w-3.5 text-accent-strong shrink-0" strokeWidth={2.6} />
                           <span className="truncate">{s?.name ?? "Silinmiş Hizmet"}</span>
                         </span>
                         {s && s.basePrice > 0 && (

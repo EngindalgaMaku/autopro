@@ -83,7 +83,7 @@ export function SignInForm() {
 
       <p className="mt-6 text-center text-sm text-muted">
         Hesabınız yok mu?{" "}
-        <Link href="/kayit" className="font-semibold text-accent hover:text-accent-hover">
+        <Link href="/kayit" className="font-semibold text-accent-strong hover:text-accent-hover">
           Atölyenizi kaydedin
         </Link>
       </p>

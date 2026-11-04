@@ -24,7 +24,7 @@ export function QRScannerDialog({ open, onOpenChange }: QRScannerDialogProps) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [manualInput, setManualInput] = useState("");
@@ -45,10 +45,8 @@ export function QRScannerDialog({ open, onOpenChange }: QRScannerDialogProps) {
       cancelAnimationFrame(requestRef.current);
       requestRef.current = null;
     }
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-    }
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
     setCameraActive(false);
     setIsScanning(false);
   };
@@ -61,10 +59,9 @@ export function QRScannerDialog({ open, onOpenChange }: QRScannerDialogProps) {
         video: { facingMode: "environment" },
         audio: false,
       });
-      setStream(mediaStream);
+      streamRef.current = mediaStream;
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        videoRef.current.setAttribute("playsinline", "true");
         await videoRef.current.play();
         setCameraActive(true);
         scanFrame();
@@ -93,11 +90,10 @@ export function QRScannerDialog({ open, onOpenChange }: QRScannerDialogProps) {
       } catch {}
     }
 
-    // If starts with AP- or length is typical token/ID
-    if (clean.startsWith("AP-") || clean.length >= 10) {
-      router.push(`/is/${encodeURIComponent(clean)}`);
+    if (/^AP-/i.test(clean)) {
+      router.push(`/is/no/${encodeURIComponent(clean)}`);
     } else {
-      // Treat as plate
+      // Anything else is a plate typed by hand
       router.push(`/musteriler?q=${encodeURIComponent(clean.replace(/\s+/g, "").toUpperCase())}`);
     }
   };
@@ -137,7 +133,7 @@ export function QRScannerDialog({ open, onOpenChange }: QRScannerDialogProps) {
       <DialogContent className="sm:max-w-md border-line bg-surface p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-ink">
-            <QrCode className="h-5 w-5 text-accent" />
+            <QrCode className="h-5 w-5 text-accent-strong" />
             İş Emri & QR Tarayıcı
           </DialogTitle>
           <DialogDescription className="text-muted">
@@ -148,13 +144,11 @@ export function QRScannerDialog({ open, onOpenChange }: QRScannerDialogProps) {
         <div className="space-y-4">
           {/* Camera View Area */}
           <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-line bg-sunken flex items-center justify-center">
+            {/* Always in the page: the stream needs somewhere to go before it starts playing */}
+            <video ref={videoRef} muted playsInline className={cameraActive ? "h-full w-full object-cover" : "hidden"} />
+            <canvas ref={canvasRef} className="hidden" />
             {cameraActive ? (
               <>
-                <video
-                  ref={videoRef}
-                  className="h-full w-full object-cover"
-                />
-                <canvas ref={canvasRef} className="hidden" />
                 {/* Scanner Target Box */}
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                   <div className="relative h-44 w-44 rounded-xl border-2 border-accent/80 shadow-2xl">
@@ -189,7 +183,7 @@ export function QRScannerDialog({ open, onOpenChange }: QRScannerDialogProps) {
                 >
                   {isScanning && !cameraError ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin text-accent" />
+                      <Loader2 className="h-4 w-4 animate-spin text-accent-strong" />
                       Kamera Açılıyor...
                     </>
                   ) : (

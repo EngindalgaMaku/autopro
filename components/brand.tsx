@@ -10,7 +10,7 @@ export function BrandMark({ withName = true }: { withName?: boolean }) {
       </span>
       {withName && (
         <span className="font-display text-[22px] font-bold">
-          Auto<span className="text-accent">Pro</span>
+          Auto<span className="text-accent-strong">Pro</span>
         </span>
       )}
     </span>

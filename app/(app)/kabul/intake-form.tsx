@@ -345,7 +345,7 @@ export function IntakeForm({
         <div className="flex justify-center">
           <Plate plate={done.plate} size="md" />
         </div>
-        <p className="font-display text-2xl font-bold text-accent">{tl(done.total)}</p>
+        <p className="font-display text-2xl font-bold text-accent-strong">{tl(done.total)}</p>
         <div className="space-y-2">
           {/* Damage is recorded before the link goes out, so the customer sees it when they open it */}
           <Link href={`/is/${done.id}/kayit`} className={buttonStyles({ size: "lg", className: "w-full" })}>
@@ -365,7 +365,7 @@ export function IntakeForm({
             target="_blank"
             className={buttonStyles({ variant: "secondary", size: "lg", className: "w-full" })}
           >
-            <Printer className="h-5 w-5 text-accent" aria-hidden="true" />
+            <Printer className="h-5 w-5 text-accent-strong" aria-hidden="true" />
             Kabul Fişini Yazdır (A4)
           </Link>
           <Button variant="secondary" size="lg" className="w-full" onClick={reset}>
@@ -429,7 +429,7 @@ export function IntakeForm({
                     {match.lastVisit.summary && ` · ${match.lastVisit.summary}`}
                   </p>
                 )}
-                {match.customer.notes && <p className="text-sm text-accent">{match.customer.notes}</p>}
+                {match.customer.notes && <p className="text-sm text-accent-strong">{match.customer.notes}</p>}
               </div>
             )}
             {lookup === "found" && match?.openOrder && (
@@ -438,7 +438,7 @@ export function IntakeForm({
                 Bu araç zaten atölyede ({match.openOrder.number}). Yine de yeni kabul açabilirsiniz.
               </p>
             )}
-            {lookup === "new" && <p className="text-sm font-semibold text-accent">Yeni araç: bilgileri girin</p>}
+            {lookup === "new" && <p className="text-sm font-semibold text-accent-strong">Yeni araç: bilgileri girin</p>}
 
             {(lookup === "found" || lookup === "new") && (
               <>
@@ -530,7 +530,7 @@ export function IntakeForm({
             </div>
             {services.length === 0 ? (
               <p className="p-6 text-sm text-muted">
-                Hizmet yok. <Link href="/hizmetler" className="text-accent">Hizmet ekleyin</Link>.
+                Hizmet yok. <Link href="/hizmetler" className="text-accent-strong">Hizmet ekleyin</Link>.
               </p>
             ) : (
               <>
@@ -576,7 +576,7 @@ export function IntakeForm({
                           </span>
                         </span>
                         {!on && (
-                          <span className={cn("font-display text-lg font-semibold tabular-nums", list === 0 && "text-sm text-accent")}>
+                          <span className={cn("font-display text-lg font-semibold tabular-nums", list === 0 && "text-sm text-accent-strong")}>
                             {list > 0 ? tl(list) : "Fiyat yok"}
                           </span>
                         )}
@@ -675,13 +675,13 @@ export function IntakeForm({
       </div>
 
       {/* Total and the one action, always in reach */}
-      <div className="sticky bottom-[calc(72px+env(safe-area-inset-bottom))] z-30 -mx-4 mt-5 border-t border-line bg-ground/95 px-4 py-3 backdrop-blur md:bottom-0 md:mx-0 md:rounded-t-2xl md:border-x">
+      <div className="hide-on-keyboard sticky bottom-[calc(72px+env(safe-area-inset-bottom))] z-30 -mx-4 mt-5 border-t border-line bg-ground/95 px-4 py-3 backdrop-blur md:bottom-0 md:mx-0 md:rounded-t-2xl md:border-x">
         <div className="mx-auto flex max-w-6xl items-center gap-4">
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted">
               {Object.keys(picked).length} hizmet{depositValue > 0 && ` · kapora ${tl(depositValue)}`}
             </p>
-            <p className="font-display text-[28px] font-bold leading-tight text-accent tabular-nums">{tl(total)}</p>
+            <p className="font-display text-[28px] font-bold leading-tight text-accent-strong tabular-nums">{tl(total)}</p>
           </div>
           <Button size="lg" onClick={submit} disabled={saving}>
             {saving ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <Check className="h-5 w-5" aria-hidden="true" />}

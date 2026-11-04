@@ -3,7 +3,7 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *, .dark, .dark *));
 
 :root {
-  /* LaundryPro Light Mode: Clean White, Modern Slate, Amber & Sapphire Accents */
+  /* Light theme. Amber fills carry dark text; amber as text on white needs the deeper shade (accent-strong) */
   --color-ground: #f8fafc;
   --color-sunken: #f1f5f9;
   --color-surface: #ffffff;
@@ -12,17 +12,29 @@
   --color-line: #e2e8f0;
   --color-line-strong: #cbd5e1;
   --color-ink: #0f172a;
-  --color-muted: #64748b;
+  --color-muted: #56657a;
   --color-accent: #f59e0b;
-  --color-accent-hover: #d97706;
-  --color-accent-ink: #ffffff;
-  --color-ready: #10b981;
+  --color-accent-hover: #fbbf24;
+  --color-accent-ink: #1a1300;
+  --color-accent-strong: #a54a05;
+  --color-ready: #06694c;
   --color-ready-bg: #ecfdf5;
-  --color-info: #0284c7;
+  --color-info: #0369a1;
   --color-info-bg: #f0f9ff;
-  --color-danger: #ef4444;
+  --color-danger: #b91c1c;
+  --color-danger-ink: #ffffff;
   --color-danger-bg: #fef2f2;
   --color-plate-blue: #1d4ed8;
+
+  /* Vehicle diagram */
+  --diagram-panel: #e6ebf2;
+  --diagram-panel-on: #cbd5e1;
+  --diagram-glass: #f8fafc;
+  --diagram-stroke: #64748b;
+  --diagram-wheel: #64748b;
+  --diagram-text: #0f172a;
+  --diagram-mark: #dc2626;
+  --diagram-mark-ring: #ffffff;
 
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-barlow), var(--font-inter), sans-serif;
@@ -45,13 +57,24 @@
   --color-accent: #ffb020;
   --color-accent-hover: #ffc94d;
   --color-accent-ink: #140d00;
+  --color-accent-strong: #ffb020;
   --color-ready: #34d399;
   --color-ready-bg: #064e3b;
   --color-info: #38bdf8;
   --color-info-bg: #0c4a6e;
   --color-danger: #f87171;
+  --color-danger-ink: #1a0a0a;
   --color-danger-bg: #450a0a;
   --color-plate-blue: #1d4ed8;
+
+  --diagram-panel: #22262e;
+  --diagram-panel-on: #2e333c;
+  --diagram-glass: #16191e;
+  --diagram-stroke: #5b6270;
+  --diagram-wheel: #5b6270;
+  --diagram-text: #f3f4f6;
+  --diagram-mark: #f87171;
+  --diagram-mark-ring: #111317;
 }
 
 @theme {
@@ -67,11 +90,13 @@
   --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
   --color-accent-ink: var(--color-accent-ink);
+  --color-accent-strong: var(--color-accent-strong);
   --color-ready: var(--color-ready);
   --color-ready-bg: var(--color-ready-bg);
   --color-info: var(--color-info);
   --color-info-bg: var(--color-info-bg);
   --color-danger: var(--color-danger);
+  --color-danger-ink: var(--color-danger-ink);
   --color-danger-bg: var(--color-danger-bg);
   --color-plate-blue: var(--color-plate-blue);
 
@@ -166,14 +191,51 @@
   }
 }
 
+/* The on-screen keyboard is up (components/mobile-shell.tsx) */
+html[data-keyboard] .hide-on-keyboard {
+  display: none !important;
+}
+
 @media print {
   html, body {
+    overflow: visible !important;
     background: #ffffff !important;
     color: #000000 !important;
     color-scheme: light !important;
   }
   .no-print {
     display: none !important;
+  }
+  /* A dialog with something to print (the receipt): only its content goes on paper */
+  body:has(.print-area) > :not(.print-area) {
+    display: none !important;
+  }
+  .print-area {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    --tw-translate-x: 0 !important;
+    --tw-translate-y: 0 !important;
+    translate: 0 0 !important;
+    transform: none !important;
+    animation: none !important;
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+  .print-area > button {
+    display: none !important;
+  }
+  .print-area .overflow-y-auto {
+    overflow: visible !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #ffffff !important;
   }
   .print-only {
     display: block !important;

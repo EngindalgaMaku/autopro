@@ -29,6 +29,7 @@ import { Plate } from "@/components/plate";
 import { Button, Card, Eyebrow, Input } from "@/components/ui";
 import { formatTL } from "@/lib/money";
 import { formatPhone } from "@/lib/phone";
+import { useEscape } from "@/lib/use-escape";
 import { cn } from "@/lib/utils";
 import { createStaff, toggleStaffStatus, updateCommissionRate } from "./actions";
 
@@ -78,6 +79,7 @@ export function PersonelClient({
   const router = useRouter();
   const [filterRole, setFilterRole] = useState<string>("ALL");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  useEscape(isModalOpen, () => setIsModalOpen(false));
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [editingRateId, setEditingRateId] = useState<string | null>(null);
   const [newRateValue, setNewRateValue] = useState<string>("");
@@ -165,7 +167,7 @@ export function PersonelClient({
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="flex items-center gap-4 p-5 shadow-sm">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10 text-accent-strong">
             <Users className="h-6 w-6" />
           </div>
           <div>
@@ -189,7 +191,7 @@ export function PersonelClient({
         </Card>
 
         <Card className="flex items-center gap-4 p-5 shadow-sm">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-700 dark:text-blue-400">
             <TrendingUp className="h-6 w-6" />
           </div>
           <div>
@@ -201,12 +203,12 @@ export function PersonelClient({
         </Card>
 
         <Card className="flex items-center gap-4 p-5 shadow-sm">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-800 dark:text-amber-400">
             <BadgePercent className="h-6 w-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-muted">Toplam Prim Hak Edişi</p>
-            <p className="font-display text-2xl font-bold text-accent">
+            <p className="font-display text-2xl font-bold text-accent-strong">
               {formatTL(totalCommission)}
             </p>
           </div>
@@ -265,7 +267,7 @@ export function PersonelClient({
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[minmax(250px,1.2fr)_110px_130px_130px_150px_auto] items-center gap-4 p-5">
                   {/* Col 1: Avatar & Info */}
                   <div className="col-span-2 sm:col-span-4 lg:col-span-1 flex items-center gap-3.5 min-w-0">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-accent/25 bg-accent/10 font-display text-lg font-bold text-accent shadow-sm">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-accent/25 bg-accent/10 font-display text-lg font-bold text-accent-strong shadow-sm">
                       {cleanStaffName.slice(0, 2).toUpperCase()}
                     </div>
                     <div className="min-w-0">
@@ -274,16 +276,16 @@ export function PersonelClient({
                         <span
                           className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-bold ${
                             staff.role === "TECHNICIAN"
-                              ? "bg-accent/15 text-accent"
+                              ? "bg-accent/15 text-accent-strong"
                               : staff.role === "VALET"
-                              ? "bg-blue-500/15 text-blue-400"
-                              : "bg-purple-500/15 text-purple-400"
+                              ? "bg-blue-500/15 text-blue-700 dark:text-blue-400"
+                              : "bg-purple-500/15 text-purple-700 dark:text-purple-400"
                           }`}
                         >
                           {ROLE_LABELS[staff.role] || staff.role}
                         </span>
                         {!staff.isActive && (
-                          <span className="shrink-0 rounded-md bg-rose-500/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-400">
+                          <span className="shrink-0 rounded-md bg-rose-500/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-700 dark:text-rose-400">
                             Pasif
                           </span>
                         )}
@@ -347,7 +349,7 @@ export function PersonelClient({
                           setEditingRateId(staff.id);
                           setNewRateValue(String(staff.commissionRate));
                         }}
-                        className="mt-0.5 inline-flex items-center gap-1 font-mono text-sm font-bold text-accent hover:underline"
+                        className="mt-0.5 inline-flex items-center gap-1 font-mono text-sm font-bold text-accent-strong hover:underline"
                         title="Prim oranını düzenle"
                       >
                         %{staff.commissionRate}
@@ -358,7 +360,7 @@ export function PersonelClient({
 
                   {/* Col 5: Hakediş Primi */}
                   <div className="col-span-1 rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-right w-full min-w-0">
-                    <p className="text-[10px] font-semibold text-accent uppercase tracking-wider whitespace-nowrap lg:hidden">Hakediş Primi</p>
+                    <p className="text-[10px] font-semibold text-accent-strong uppercase tracking-wider whitespace-nowrap lg:hidden">Hakediş Primi</p>
                     <p className="font-display text-xl font-bold text-ink whitespace-nowrap">
                       {formatTL(staff.commissionPayout)}
                     </p>
@@ -417,14 +419,14 @@ export function PersonelClient({
                               <th className="pb-2 font-medium">Uygulanan Hizmet</th>
                               <th className="pb-2 font-medium">Tarih</th>
                               <th className="pb-2 font-medium text-right">İş Tutarı</th>
-                              <th className="pb-2 font-medium text-right text-accent">Prim Tutarı (%{staff.commissionRate})</th>
+                              <th className="pb-2 font-medium text-right text-accent-strong">Prim Tutarı (%{staff.commissionRate})</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-line/40">
                             {staff.recentJobs.map((job) => (
                               <tr key={job.id} className="hover:bg-raised/40">
                                 <td className="py-2.5 font-mono">
-                                  <Link href={`/is/${job.id}`} className="text-accent hover:underline">
+                                  <Link href={`/is/${job.id}`} className="text-accent-strong hover:underline">
                                     #{job.orderNumber}
                                   </Link>
                                 </td>
@@ -439,7 +441,7 @@ export function PersonelClient({
                                 <td className="py-2.5 text-right font-mono font-bold text-ink">
                                   {formatTL(job.price)}
                                 </td>
-                                <td className="py-2.5 text-right font-mono font-bold text-accent">
+                                <td className="py-2.5 text-right font-mono font-bold text-accent-strong">
                                   {formatTL(job.commissionShare)}
                                 </td>
                               </tr>
@@ -458,7 +460,7 @@ export function PersonelClient({
 
       {/* New Staff Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <div role="dialog" aria-modal="true" aria-label="Yeni personel" className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
           <div className="w-full max-w-lg rounded-2xl border border-line bg-surface p-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-line pb-4">
               <div>

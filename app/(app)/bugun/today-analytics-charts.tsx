@@ -56,7 +56,7 @@ export function TodayAnalyticsCharts({
             <p className="text-xs text-muted mt-0.5">Son 7 günde kabul edilen araç hacmi</p>
           </div>
           <div className="text-right">
-            <span className="text-xs font-semibold text-accent uppercase tracking-wider">7 Günlük Toplam</span>
+            <span className="text-xs font-semibold text-accent-strong uppercase tracking-wider">7 Günlük Toplam</span>
             <p className="text-lg font-bold font-display text-ink">
               {weeklyData.reduce((acc, d) => acc + d.count, 0)} Araç
             </p>
@@ -92,7 +92,7 @@ export function TodayAnalyticsCharts({
                       return (
                         <div className="rounded-xl border border-line bg-surface p-2.5 shadow-xl text-xs">
                           <p className="font-semibold text-ink">{payload[0].payload.day}</p>
-                          <p className="text-accent font-bold mt-0.5">
+                          <p className="text-accent-strong font-bold mt-0.5">
                             {payload[0].value} Araç Kabul
                           </p>
                         </div>
@@ -161,7 +161,7 @@ export function TodayAnalyticsCharts({
                           return (
                             <div className="rounded-xl border border-line bg-surface p-2 shadow-xl text-xs">
                               <p className="font-semibold text-ink">{payload[0].name}</p>
-                              <p className="text-accent font-bold">
+                              <p className="text-accent-strong font-bold">
                                 {payload[0].value} İşlem
                               </p>
                             </div>

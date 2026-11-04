@@ -40,6 +40,8 @@ npm run cap:sync    # Web varlıklarını ve eklentileri Android projesine eşit
 npm run cap:open    # Android Studio'yu açar
 ```
 
+Uygulama canlı siteyi açar (`https://autopro.kodleon.com`); başka bir sunucu için `CAPACITOR_SERVER_URL` verilir. Gradle için Java 21 gerekir. Yayın imzası `android/keystore.properties` dosyasından okunur, bu dosya depoya girmez. İkon ve açılış görselleri `assets/` klasöründen `npx @capacitor/assets generate --android` ile üretilir.
+
 ### Demo modu
 
 `AUTO_SEED=true` ile uygulama herkese açık demo olarak çalışır: demo atölyesi açılışta ve her gece 03.00'te yeniden kurulur, demo hesapta şifre, işletme bilgisi ve personel işlemleri kapanır, fotoğraf yüklemeye sınır gelir. Kendi kaydolan atölyelere dokunulmaz.

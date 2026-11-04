@@ -65,7 +65,7 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
       : [];
 
   return (
-    <main className="mx-auto max-w-md space-y-4 px-4 py-6">
+    <main className="mx-auto max-w-md space-y-4 px-4 pb-6 pt-[calc(1.5rem+env(safe-area-inset-top))]">
       <header className="flex items-center justify-between">
         <span className="font-display text-lg font-bold">{order.business.name}</span>
         <span className="text-xs text-muted">Üyelik gerekmez</span>
@@ -78,7 +78,7 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
         </div>
         <div>
           <p className="text-sm text-muted">Aracınız şu anda</p>
-          <p className={cn("font-display text-[26px] font-bold", order.stage === "READY" || order.stage === "DELIVERED" ? "text-ready" : order.stage === "CANCELLED" ? "text-danger" : "text-accent")}>
+          <p className={cn("font-display text-[26px] font-bold", order.stage === "READY" || order.stage === "DELIVERED" ? "text-ready" : order.stage === "CANCELLED" ? "text-danger" : "text-accent-strong")}>
             {STAGES[order.stage].customerLabel}
           </p>
           {order.promisedAt && !finished && order.stage !== "CANCELLED" && (
@@ -154,7 +154,7 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
                 {ins.marks.map((m) => (
                   <li key={m.id} className="space-y-1.5 text-sm">
                     <p>
-                      <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-danger text-[11px] font-bold text-[#1a0a0a]">{m.number}</span>
+                      <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-danger text-[11px] font-bold text-danger-ink">{m.number}</span>
                       {PART_LABELS[m.part]} · {DAMAGE_KINDS[m.kind]}
                     </p>
                     {m.note && <p className="text-xs text-muted">{m.note}</p>}

@@ -160,7 +160,7 @@ export default async function WorkshopPage({
                       className="flex h-9 items-center gap-1.5 rounded-xl border border-line bg-raised px-2.5 text-xs font-semibold text-ink transition hover:bg-surface"
                       title="Kabul fişini yazdır"
                     >
-                      <Printer className="h-3.5 w-3.5 text-accent" />
+                      <Printer className="h-3.5 w-3.5 text-accent-strong" />
                       <span className="hidden sm:inline">Fiş</span>
                     </Link>
                     <Link
@@ -169,7 +169,7 @@ export default async function WorkshopPage({
                       className="flex h-9 items-center gap-1.5 rounded-xl border border-line bg-raised px-2.5 text-xs font-semibold text-ink transition hover:bg-surface"
                       title="Garanti sertifikasını aç"
                     >
-                      <Award className="h-3.5 w-3.5 text-accent" />
+                      <Award className="h-3.5 w-3.5 text-accent-strong" />
                       <span className="hidden sm:inline">Sertifika</span>
                     </Link>
                     <Link

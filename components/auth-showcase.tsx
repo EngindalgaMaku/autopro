@@ -68,7 +68,7 @@ function TrackingPreview() {
         <Plate plate="34ABC789" size="sm" />
         <div>
           <p className="text-xs text-muted">Aracınız şu anda</p>
-          <p className="font-display text-xl font-bold text-accent">Uygulamada</p>
+          <p className="font-display text-xl font-bold text-accent-strong">Uygulamada</p>
           <p className="text-xs">Tahmini teslim: Cuma 17:00</p>
         </div>
         <div className="grid grid-cols-5 gap-1" aria-hidden="true">
@@ -136,14 +136,14 @@ export function AuthShowcase() {
       <div className="flex items-center justify-between">
         <BrandMark />
         <span className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-xs text-muted">
-          <CalendarClock className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+          <CalendarClock className="h-3.5 w-3.5 text-accent-strong" aria-hidden="true" />
           Detailing ve oto kuaför atölyeleri için
         </span>
       </div>
 
       <div className="my-auto grid grid-cols-12 items-center gap-10 py-10">
         <div className="col-span-6 space-y-5" aria-live="polite">
-          <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent">{slide.badge}</span>
+          <span className="inline-flex rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent-strong">{slide.badge}</span>
           <h2 className="font-display text-[34px] font-bold leading-tight xl:text-[40px]">{slide.title}</h2>
           <p className="leading-relaxed text-muted">{slide.text}</p>
           <div className="flex gap-2 pt-1" role="tablist" aria-label="Tanıtım">
@@ -173,7 +173,7 @@ export function AuthShowcase() {
         <ul className="grid grid-cols-4 gap-3 border-t border-line pt-6">
           {FEATURES.map(({ icon: Icon, title, text }) => (
             <li key={title} className="flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-raised text-accent">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-raised text-accent-strong">
                 <Icon className="h-4 w-4" aria-hidden="true" />
               </span>
               <span>
@@ -197,7 +197,7 @@ export function AuthFeatures() {
       <ul className="grid gap-3 sm:grid-cols-2">
         {FEATURES.map(({ icon: Icon, title, text }) => (
           <li key={title} className="flex items-start gap-3 rounded-card border border-line bg-surface p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-raised text-accent">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-raised text-accent-strong">
               <Icon className="h-4 w-4" aria-hidden="true" />
             </span>
             <span>
