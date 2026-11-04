@@ -35,6 +35,7 @@ export default function SignUpPage() {
             <Link href="/kvkk" className="text-accent">KVKK aydınlatma metnini</Link> okudum, onaylıyorum.
           </span>
         </label>
+        <p className="text-sm text-muted">Bu bir tanıtım sürümüdür. Gerçek müşteri bilgisi girmeyin.</p>
         {state.error && (
           <p role="alert" className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">
             {state.error}

@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { DEMO_LOCKED } from "@/lib/demo";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import type { Role } from "@prisma/client";
@@ -22,6 +23,7 @@ export async function createStaff(formData: FormData) {
     if (user.role !== "OWNER" && user.role !== "MANAGER") {
       return { error: "Yetkisiz işlem. Yalnızca işletme sahibi veya yönetici personel ekleyebilir." };
     }
+    if (user.business.isDemo) return { error: DEMO_LOCKED };
 
     const raw = {
       name: String(formData.get("name") ?? ""),
@@ -97,6 +99,8 @@ export async function toggleStaffStatus(userId: string, isActive: boolean) {
     if (user.role !== "OWNER" && user.role !== "MANAGER") {
       return { error: "Yetkisiz işlem." };
     }
+
+    if (user.business.isDemo) return { error: DEMO_LOCKED };
 
     if (userId === user.id) {
       return { error: "Kendi hesabınızı pasife alamazsınız." };

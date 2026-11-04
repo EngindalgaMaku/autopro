@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { DEMO_LOCKED } from "@/lib/demo";
 import { prisma } from "@/lib/db";
 import { isValidPhone, normalizePhone } from "@/lib/phone";
 import { canManage, requireUser } from "@/lib/session";
@@ -26,6 +27,7 @@ const businessSchema = z.object({
 export async function updateBusiness(prev: SettingsState, form: FormData): Promise<SettingsState> {
   const user = await requireUser();
   if (!canManage(user.role)) return { error: "İşletme bilgilerini güncelleme yetkiniz yok." };
+  if (user.business.isDemo) return { error: DEMO_LOCKED };
 
   const parsed = businessSchema.safeParse({
     name: form.get("name"),
@@ -73,6 +75,7 @@ const passwordSchema = z.object({
 
 export async function changePassword(prev: SettingsState, form: FormData): Promise<SettingsState> {
   const user = await requireUser();
+  if (user.business.isDemo) return { error: DEMO_LOCKED };
 
   const parsed = passwordSchema.safeParse({
     currentPassword: form.get("currentPassword"),

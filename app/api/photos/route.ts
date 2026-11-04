@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PhotoKind } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { DEMO_MAX_PHOTO_BYTES, DEMO_PHOTOS_PER_BUSINESS, DEMO_PHOTOS_TOTAL, isDemoMode } from "@/lib/demo";
 import { MAX_PHOTO_BYTES, savePhoto } from "@/lib/photos";
 import { readSession } from "@/lib/session";
 
@@ -27,6 +28,14 @@ export async function POST(request: NextRequest) {
   if (damageMarkId) {
     const mark = await prisma.damageMark.count({ where: { id: damageMarkId, inspectionId: order.inspection?.id ?? "-" } });
     if (!mark) return NextResponse.json({ error: "Hasar işareti bulunamadı" }, { status: 404 });
+  }
+
+  if (isDemoMode()) {
+    if (file.size > DEMO_MAX_PHOTO_BYTES) return NextResponse.json({ error: "Demoda fotoğraf en fazla 3 MB olabilir" }, { status: 413 });
+    const [own, all] = await Promise.all([prisma.photo.count({ where: { businessId: order.businessId } }), prisma.photo.count()]);
+    if (own >= DEMO_PHOTOS_PER_BUSINESS || all >= DEMO_PHOTOS_TOTAL) {
+      return NextResponse.json({ error: "Demoda fotoğraf sınırına ulaşıldı" }, { status: 429 });
+    }
   }
 
   try {

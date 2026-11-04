@@ -26,6 +26,7 @@ model Business {
   taxNumber        String?  @map("tax_number")
   vatRate          Decimal  @default(20) @map("vat_rate") @db.Decimal(5, 2)
   pricesIncludeVat Boolean  @default(true) @map("prices_include_vat")
+  isDemo           Boolean  @default(false) @map("is_demo") // the shared demo workshop: reset nightly, account changes locked
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 

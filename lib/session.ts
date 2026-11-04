@@ -62,7 +62,7 @@ export async function getCurrentUser() {
         role: true,
         isActive: true,
         businessId: true,
-        business: { select: { id: true, name: true } },
+        business: { select: { id: true, name: true, isDemo: true } },
       },
     });
     if (!user || !user.isActive || user.businessId !== session.businessId) {

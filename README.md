@@ -39,3 +39,7 @@ npm run dev
 npm run cap:sync    # Web varlıklarını ve eklentileri Android projesine eşitler
 npm run cap:open    # Android Studio'yu açar
 ```
+
+### Demo modu
+
+`AUTO_SEED=true` ile uygulama herkese açık demo olarak çalışır: demo atölyesi açılışta ve her gece 03.00'te yeniden kurulur, demo hesapta şifre, işletme bilgisi ve personel işlemleri kapanır, fotoğraf yüklemeye sınır gelir. Kendi kaydolan atölyelere dokunulmaz.

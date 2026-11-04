@@ -55,6 +55,7 @@ export function SignInForm() {
           <span className="font-semibold text-ink">Demo Hesaplar</span>
           <span className="text-muted">Şifre: 12345678</span>
         </div>
+        <p className="mt-1.5 text-muted">Veriler her gece sıfırlanır. Gerçek bilgi girmeyin.</p>
         <div className="mt-2.5 flex flex-wrap gap-2">
           <button
             type="button"
