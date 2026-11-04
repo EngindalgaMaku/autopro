@@ -13,3 +13,7 @@ storage/
 android/keystore.properties
 *.jks
 *.keystore
+
+# Locally built Android packages, except the one the sign-in page offers
+*.apk
+!/public/AutoPro.apk

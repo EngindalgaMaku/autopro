@@ -40,7 +40,7 @@ npm run cap:sync    # Web varlıklarını ve eklentileri Android projesine eşit
 npm run cap:open    # Android Studio'yu açar
 ```
 
-Uygulama canlı siteyi açar (`https://autopro.kodleon.com`); başka bir sunucu için `CAPACITOR_SERVER_URL` verilir. Gradle için Java 21 gerekir. Yayın imzası `android/keystore.properties` dosyasından okunur, bu dosya depoya girmez. İkon ve açılış görselleri `assets/` klasöründen `npx @capacitor/assets generate --android` ile üretilir.
+Uygulama canlı siteyi açar (`https://autopro.kodleon.com`); başka bir sunucu için `CAPACITOR_SERVER_URL` verilir. Gradle için Java 21 gerekir. Yayın imzası `android/keystore.properties` ve `android/autopro-upload.jks` dosyalarından okunur, ikisi de depoya girmez; kaybolursa uygulama aynı imzayla güncellenemez, yedekleyin. Sitedeki APK: `cd android && ./gradlew assembleRelease`, sonra `app/build/outputs/apk/release/app-release.apk` dosyası `public/AutoPro.apk` olarak kopyalanır. İkon ve açılış görselleri `assets/` klasöründen `npx @capacitor/assets generate --android` ile üretilir.
 
 ### Demo modu
 
