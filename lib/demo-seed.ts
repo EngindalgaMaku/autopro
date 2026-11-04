@@ -52,7 +52,7 @@ export async function seedDemo(prisma: PrismaClient) {
   const owner = await prisma.user.create({
     data: {
       businessId: business.id,
-      name: "Engin Dalga",
+      name: "Demo Yönetici",
       email: "demo@autopro.com",
       phone: "05321000001",
       passwordHash: defaultPasswordHash,
