@@ -7,6 +7,7 @@ import type { ServiceKind, StationType, VehicleSegment } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { isValidPhone, normalizePhone } from "@/lib/phone";
 import { endSession, startSession } from "@/lib/session";
+import { sessionSecretProblem } from "@/lib/session-secret";
 import { SEGMENTS } from "@/lib/stages";
 
 export interface FormState {
@@ -53,6 +54,7 @@ const signUpSchema = z.object({
 });
 
 export async function signUp(_prev: FormState, form: FormData): Promise<FormState> {
+  if (sessionSecretProblem()) return { error: SIGN_IN_OFF };
   const fields = Object.fromEntries([...form.entries()].map(([k, v]) => [k, String(v)]));
   const parsed = signUpSchema.safeParse(fields);
   if (!parsed.success) return { error: parsed.error.issues[0].message, fields: { ...fields, password: "" } };
@@ -97,10 +99,12 @@ export async function signUp(_prev: FormState, form: FormData): Promise<FormStat
 
 // Wrong passwords per e-mail, in memory: enough to slow down guessing on one server
 const failures = new Map<string, { count: number; until: number }>();
+const SIGN_IN_OFF = "Sunucu ayarı eksik olduğu için şu an giriş yapılamıyor.";
 const LOCK_AFTER = 5;
 const LOCK_MS = 15 * 60 * 1000;
 
 export async function signIn(_prev: FormState, form: FormData): Promise<FormState> {
+  if (sessionSecretProblem()) return { error: SIGN_IN_OFF };
   const email = String(form.get("email") || "").trim().toLowerCase();
   const password = String(form.get("password") || "");
   const fields = { email };
