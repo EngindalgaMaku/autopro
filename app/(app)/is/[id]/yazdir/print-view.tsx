@@ -63,10 +63,11 @@ export interface PrintWorkOrderData {
     microns: number;
   }>;
   qrDataUrl: string;
+  trackUrl: string;
 }
 
 export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
-  const { order, vehicle, customer, business, items, marks, readings, qrDataUrl } = data;
+  const { order, vehicle, customer, business, items, marks, readings, qrDataUrl, trackUrl } = data;
 
   const handlePrint = () => {
     window.print();
@@ -300,19 +301,7 @@ export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
 
         {/* Detailing Workshop Terms & Acceptance Agreement */}
         <div className="mt-4 rounded border border-slate-200 bg-slate-50 p-2 text-[10px] leading-tight text-slate-600 space-y-1">
-          <p className="font-bold text-slate-800 uppercase tracking-wider text-[9px]">Araç Kabul ve Detailing Taahhütnamesi</p>
-          <p>
-            1. Araç içerisinde bırakılan nakit para, kıymetli eşya ve elektronik cihazlardan işletmemiz hukuki olarak sorumlu tutulamaz.
-          </p>
-          <p>
-            2. Kabul aşamasında yukarıdaki krokide işaretlenen mevcut çizik, göçük ve boya kalınlıkları müşteri tarafından doğrulanmıştır.
-          </p>
-          <p>
-            3. Seramik kaplama ve PPF uygulamalarında garanti kapsamı, ürün kılavuzunda belirtilen periyodik bakım koşullarına riayet edilmesine bağlıdır.
-          </p>
-          <p>
-            4. İşlemi biten ve hazır bildirimi yapılan araçların 3 iş günü içerisinde teslim alınması esastır.
-          </p>
+          <p>Kabulde yukarıda işaretlenen hasarları ve boya ölçümlerini gördüm.</p>
         </div>
 
         {/* Dual Signature Blocks */}
@@ -336,8 +325,7 @@ export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
 
         {/* Footer Info */}
         <div className="mt-4 border-t border-slate-200 pt-2 flex items-center justify-between text-[9px] text-slate-500">
-          <span>AutoPro Detailing Workshop OS · www.autopro.app</span>
-          <span>Online Takip: autopro.app/t/{order.trackingToken}</span>
+          <span>Takip: {trackUrl}</span>
           <span>Basım: {new Date().toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" })}</span>
         </div>
       </div>

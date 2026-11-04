@@ -7,6 +7,8 @@ import {
   BadgePercent,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   CircleDot,
   Loader2,
@@ -60,7 +62,19 @@ const ROLE_LABELS: Record<string, string> = {
   VALET: "Vale",
 };
 
-export function PersonelClient({ staffList }: { staffList: StaffItem[] }) {
+export function PersonelClient({
+  staffList,
+  deliveredCount,
+  monthTitle,
+  prevMonth,
+  nextMonth,
+}: {
+  staffList: StaffItem[];
+  deliveredCount: number;
+  monthTitle: string;
+  prevMonth: string;
+  nextMonth: string | null;
+}) {
   const router = useRouter();
   const [filterRole, setFilterRole] = useState<string>("ALL");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -72,7 +86,6 @@ export function PersonelClient({ staffList }: { staffList: StaffItem[] }) {
   // Metrics calculation
   const totalStaff = staffList.length;
   const activeStaff = staffList.filter((s) => s.isActive).length;
-  const totalCompletedJobs = staffList.reduce((acc, s) => acc + s.completedJobsCount, 0);
   const totalRevenue = staffList.reduce((acc, s) => acc + s.totalRevenue, 0);
   const totalCommission = staffList.reduce((acc, s) => acc + s.commissionPayout, 0);
 
@@ -124,13 +137,23 @@ export function PersonelClient({ staffList }: { staffList: StaffItem[] }) {
             <h1 className="font-display text-2xl font-bold tracking-tight text-ink md:text-3xl">
               Personel & Prim Yönetimi
             </h1>
-            <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold text-accent">
-              Aylık Performans
-            </span>
           </div>
-          <p className="mt-1 text-sm text-muted">
-            Ustalarınızın iş tamamlama adetlerini, ciro katkılarını ve hak ediş primlerini yönetin.
-          </p>
+          <nav aria-label="Ay" className="mt-1 flex items-center gap-1">
+            <Link href={`/personel?ay=${prevMonth}`} aria-label="Önceki ay" className="grid h-11 w-11 place-items-center rounded-xl hover:bg-raised">
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </Link>
+            <span data-testid="month-title" className="min-w-32 text-center text-sm font-semibold text-ink first-letter:uppercase">
+              {monthTitle}
+            </span>
+            {nextMonth ? (
+              <Link href={`/personel?ay=${nextMonth}`} aria-label="Sonraki ay" className="grid h-11 w-11 place-items-center rounded-xl hover:bg-raised">
+                <ChevronRight className="h-5 w-5" aria-hidden="true" />
+              </Link>
+            ) : (
+              <span className="h-11 w-11" />
+            )}
+          </nav>
+          <p className="mt-1 text-sm text-muted">Seçilen ayda teslim edilen işler, usta ciroları ve hak edilen primler.</p>
         </div>
 
         <Button onClick={() => setIsModalOpen(true)} className="gap-2">
@@ -158,9 +181,9 @@ export function PersonelClient({ staffList }: { staffList: StaffItem[] }) {
             <UserCheck className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-xs font-medium text-muted">Tamamlanan İşler</p>
+            <p className="text-xs font-medium text-muted">Teslim Edilen İşler</p>
             <p className="font-display text-2xl font-bold text-ink">
-              {totalCompletedJobs} <span className="text-xs font-normal text-muted">araç</span>
+              {deliveredCount} <span className="text-xs font-normal text-muted">araç</span>
             </p>
           </div>
         </Card>
@@ -381,9 +404,9 @@ export function PersonelClient({ staffList }: { staffList: StaffItem[] }) {
                 {/* Expanded Details: Recent jobs */}
                 {isExpanded && (
                   <div className="border-t border-line bg-sunken/60 p-4">
-                    <Eyebrow>Tamamlanan Son Detailing İşleri ({staff.recentJobs.length})</Eyebrow>
+                    <Eyebrow>Seçilen ayda teslim edilen işler ({staff.recentJobs.length})</Eyebrow>
                     {staff.recentJobs.length === 0 ? (
-                      <p className="mt-2 text-xs text-muted">Bu personele ait henüz tamamlanmış iş kaydı bulunmuyor.</p>
+                      <p className="mt-2 text-xs text-muted">Bu personelin seçilen ayda teslim edilen işi yok.</p>
                     ) : (
                       <div className="mt-3 overflow-x-auto">
                         <table className="w-full text-left text-xs">

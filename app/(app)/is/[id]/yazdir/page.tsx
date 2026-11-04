@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { appUrl } from "@/lib/app-url";
 import { prisma } from "@/lib/db";
 import { generateQrDataUrl } from "@/lib/qr";
 import { detailSummary, type ItemDetails } from "@/lib/service-kinds";
@@ -38,8 +39,8 @@ export default async function PrintWorkOrderPage({ params }: { params: Promise<{
   const remaining = Math.max(0, totalAmount - paid);
 
   // Generate QR code for tracking URL
-  const qrUrl = `https://autopro.app/t/${order.trackingToken}`;
-  const qrDataUrl = await generateQrDataUrl(qrUrl, 160);
+  const trackUrl = `${await appUrl()}/t/${order.trackingToken}`;
+  const qrDataUrl = await generateQrDataUrl(trackUrl, 160);
 
   const printData: PrintWorkOrderData = {
     order: {
@@ -96,6 +97,7 @@ export default async function PrintWorkOrderPage({ params }: { params: Promise<{
       microns: r.microns,
     })),
     qrDataUrl,
+    trackUrl,
   };
 
   return <PrintWorkOrderView data={printData} />;

@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
+import { appUrl } from "@/lib/app-url";
 import { prisma } from "@/lib/db";
 import { generateQrDataUrl } from "@/lib/qr";
 import type { ItemDetails } from "@/lib/service-kinds";
 import { CertificateView, type CertificateData } from "./certificate-view";
 
 export const metadata = {
-  title: "Dijital Garanti Sertifikası",
-  description: "Resmi AutoPro Detailing Garanti ve Orijinallik Belgesi",
+  title: "Garanti belgesi",
   robots: { index: false, follow: false },
 };
 
@@ -21,15 +21,15 @@ export default async function CertificatePage({ params }: { params: Promise<{ to
     include: {
       business: true,
       vehicle: true,
-      customer: { select: { name: true, phone: true } },
+      customer: { select: { name: true } },
       technician: { select: { name: true } },
       items: { orderBy: { createdAt: "asc" } },
     },
   });
 
-  if (!order) notFound();
+  if (!order || order.stage !== "DELIVERED" || !order.deliveredAt) notFound();
 
-  const baseDate = order.deliveredAt ?? order.createdAt;
+  const baseDate = order.deliveredAt;
   const fmt = (d: Date) =>
     d.toLocaleDateString("tr-TR", {
       day: "numeric",
@@ -38,47 +38,27 @@ export default async function CertificatePage({ params }: { params: Promise<{ to
       timeZone: "Europe/Istanbul",
     });
 
-  // Extract warranties from items or provide detailing protection warranties
-  const warranties: CertificateData["warranties"] = order.items
-    .filter((i) => {
-      const d = (i.details ?? {}) as ItemDetails;
-      return Boolean(d.warrantyMonths) || ["CERAMIC", "PPF", "WINDOW_FILM"].includes(i.kind);
-    })
-    .map((i) => {
-      const d = (i.details ?? {}) as ItemDetails;
-      const months = d.warrantyMonths || (i.kind === "CERAMIC" ? 36 : i.kind === "PPF" ? 60 : 24);
-      const until = new Date(baseDate);
-      until.setMonth(until.getMonth() + months);
-
-      return {
+  // Only what the shop recorded, counted from the handover day: no recorded warranty, no document
+  const warranties: CertificateData["warranties"] = order.items.flatMap((i) => {
+    const d = (i.details ?? {}) as ItemDetails;
+    if (!d.warrantyMonths) return [];
+    const until = new Date(baseDate);
+    until.setMonth(until.getMonth() + d.warrantyMonths);
+    return [
+      {
         id: i.id,
         serviceName: i.name,
         productName: d.product ?? null,
-        kind: i.kind,
-        warrantyMonths: months,
+        warrantyMonths: d.warrantyMonths,
         startDate: fmt(baseDate),
         endDate: fmt(until),
         isActive: until > new Date(),
-      };
-    });
+      },
+    ];
+  });
+  if (warranties.length === 0) notFound();
 
-  // If no specific ceramic/PPF item was added, create a general workmanship warranty entry
-  if (warranties.length === 0) {
-    const until = new Date(baseDate);
-    until.setMonth(until.getMonth() + 12);
-    warranties.push({
-      id: "gen-1",
-      serviceName: "AutoPro Profesyonel Detailing & Koruma",
-      productName: "Premium Studio Care",
-      kind: "GENERAL",
-      warrantyMonths: 12,
-      startDate: fmt(baseDate),
-      endDate: fmt(until),
-      isActive: until > new Date(),
-    });
-  }
-
-  const certificateUrl = `https://autopro.app/t/${token}/sertifika`;
+  const certificateUrl = `${await appUrl()}/t/${token}/sertifika`;
   const qrDataUrl = await generateQrDataUrl(certificateUrl, 180);
 
   const certData: CertificateData = {

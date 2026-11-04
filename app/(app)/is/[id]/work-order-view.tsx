@@ -56,11 +56,13 @@ export function WorkOrderView({
   technicians,
   stations,
   businessName,
+  qrDataUrl,
 }: {
   order: OrderView;
   technicians: Array<{ id: string; name: string }>;
   stations: Array<{ id: string; name: string }>;
   businessName: string;
+  qrDataUrl: string;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -431,6 +433,7 @@ export function WorkOrderView({
           id: order.id,
           number: order.number,
           trackingToken: order.trackingToken,
+          qrDataUrl,
           plate: order.plate,
           car: order.car,
           customerName: order.customerName,
@@ -438,7 +441,7 @@ export function WorkOrderView({
           businessName: businessName,
           technician: technicians.find((t) => t.id === order.technicianId)?.name ?? null,
           station: stations.find((s) => s.id === order.stationId)?.name ?? null,
-          createdAt: order.events[0]?.at || new Date().toISOString(),
+          createdAt: order.events.at(-1)?.at || new Date().toISOString(),
           promisedAt: order.promisedAt,
           total: order.total,
           paid: order.paid,

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Role } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { sessionSecret } from "@/lib/session-secret";
 
 // The session is a signed token in an httpOnly cookie: page code never sees it, so a script
 // injected into a page cannot read it (LaundryPro keeps its token in localStorage).
@@ -16,18 +17,8 @@ export interface Session {
   role: Role;
 }
 
-function secret() {
-  const value = process.env.SESSION_SECRET;
-  if (!value || value.length < 32) {
-    return value && value.length >= 16
-      ? value.padEnd(32, "0")
-      : "autopro-session-secret-fallback-key-min-32-chars-long-2026";
-  }
-  return value;
-}
-
 export async function startSession(session: Session) {
-  const token = jwt.sign(session, secret(), { expiresIn: MAX_AGE });
+  const token = jwt.sign(session, sessionSecret(), { expiresIn: MAX_AGE });
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
@@ -50,7 +41,7 @@ export async function readSession(): Promise<Session | null> {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   try {
-    const { userId, businessId, role } = jwt.verify(token, secret()) as Session;
+    const { userId, businessId, role } = jwt.verify(token, sessionSecret()) as Session;
     return { userId, businessId, role };
   } catch {
     return null;

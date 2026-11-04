@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import { appUrl } from "@/lib/app-url";
 import { prisma } from "@/lib/db";
+import { generateQrDataUrl } from "@/lib/qr";
 import { requireUser } from "@/lib/session";
 import { detailSummary, type ItemDetails } from "@/lib/service-kinds";
 import { WorkOrderView } from "./work-order-view";
@@ -32,10 +34,12 @@ export default async function WorkOrderPage({ params }: { params: Promise<{ id: 
 
   const names = new Map(technicians.map((t) => [t.id, t.name]));
   const paid = order.payments.reduce((s, p) => s + Number(p.amount), 0);
+  const qrDataUrl = await generateQrDataUrl(`${await appUrl()}/t/${order.trackingToken}`, 160);
 
   return (
     <WorkOrderView
       businessName={user.business.name}
+      qrDataUrl={qrDataUrl}
       technicians={technicians}
       stations={stations}
       order={{
