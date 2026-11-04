@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PhotoKind } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { DEMO_MAX_PHOTO_BYTES, DEMO_PHOTOS_PER_BUSINESS, DEMO_PHOTOS_TOTAL, isDemoMode } from "@/lib/demo";
+import { DEMO_MAX_PHOTO_BYTES, DEMO_PHOTOS_PER_BUSINESS } from "@/lib/demo";
 import { MAX_PHOTO_BYTES, savePhoto } from "@/lib/photos";
+import { ENTRY_PHOTOS_PER_BUSINESS, planOf } from "@/lib/plan";
 import { readSession } from "@/lib/session";
 
 /** Upload one photo of a work order: kabul damage (tied to a mark), before or after */
@@ -22,7 +23,12 @@ export async function POST(request: NextRequest) {
 
   const order = await prisma.workOrder.findFirst({
     where: { id: workOrderId, businessId: session.businessId },
-    select: { id: true, businessId: true, inspection: { select: { id: true } } },
+    select: {
+      id: true,
+      businessId: true,
+      inspection: { select: { id: true } },
+      business: { select: { isDemo: true, createdAt: true, entryEndsAt: true, paidUntil: true } },
+    },
   });
   if (!order) return NextResponse.json({ error: "İş emri bulunamadı" }, { status: 404 });
   if (damageMarkId) {
@@ -30,12 +36,12 @@ export async function POST(request: NextRequest) {
     if (!mark) return NextResponse.json({ error: "Hasar işareti bulunamadı" }, { status: 404 });
   }
 
-  if (isDemoMode()) {
-    if (file.size > DEMO_MAX_PHOTO_BYTES) return NextResponse.json({ error: "Demoda fotoğraf en fazla 3 MB olabilir" }, { status: 413 });
-    const [own, all] = await Promise.all([prisma.photo.count({ where: { businessId: order.businessId } }), prisma.photo.count()]);
-    if (own >= DEMO_PHOTOS_PER_BUSINESS || all >= DEMO_PHOTOS_TOTAL) {
-      return NextResponse.json({ error: "Demoda fotoğraf sınırına ulaşıldı" }, { status: 429 });
-    }
+  const plan = planOf(order.business);
+  if (plan.level === "RESTRICTED") return NextResponse.json({ error: "Kısıtlı modda fotoğraf eklenemez. Tam kullanım için bize yazın." }, { status: 403 });
+  if (plan.level === "DEMO" && file.size > DEMO_MAX_PHOTO_BYTES) return NextResponse.json({ error: "Demoda fotoğraf en fazla 3 MB olabilir" }, { status: 413 });
+  const own = await prisma.photo.count({ where: { businessId: order.businessId } });
+  if (own >= (plan.level === "DEMO" ? DEMO_PHOTOS_PER_BUSINESS : ENTRY_PHOTOS_PER_BUSINESS)) {
+    return NextResponse.json({ error: "Fotoğraf sınırına ulaşıldı" }, { status: 429 });
   }
 
   try {

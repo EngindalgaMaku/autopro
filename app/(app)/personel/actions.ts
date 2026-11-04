@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { DEMO_LOCKED } from "@/lib/demo";
 import { prisma } from "@/lib/db";
+import { planOf } from "@/lib/plan";
 import { requireUser } from "@/lib/session";
 import type { Role } from "@prisma/client";
 
@@ -24,6 +25,7 @@ export async function createStaff(formData: FormData) {
       return { error: "Yetkisiz işlem. Yalnızca işletme sahibi veya yönetici personel ekleyebilir." };
     }
     if (user.business.isDemo) return { error: DEMO_LOCKED };
+    if (planOf(user.business).level === "RESTRICTED") return { error: "Kısıtlı modda yeni personel eklenemez. Tam kullanım için bize yazın." };
 
     const raw = {
       name: String(formData.get("name") ?? ""),

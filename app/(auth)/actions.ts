@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { ServiceKind, StationType, VehicleSegment } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { ENTRY_DAYS } from "@/lib/plan";
 import { isValidPhone, normalizePhone } from "@/lib/phone";
 import { endSession, startSession } from "@/lib/session";
 import { sessionSecretProblem } from "@/lib/session-secret";
@@ -66,7 +67,9 @@ export async function signUp(_prev: FormState, form: FormData): Promise<FormStat
 
   const passwordHash = await bcrypt.hash(data.password, 10);
   const user = await prisma.$transaction(async (tx) => {
-    const business = await tx.business.create({ data: { name: data.businessName, phone: normalizePhone(data.phone) } });
+    const business = await tx.business.create({
+      data: { name: data.businessName, phone: normalizePhone(data.phone), entryEndsAt: new Date(Date.now() + ENTRY_DAYS * 24 * 3600 * 1000) },
+    });
     await tx.station.createMany({
       data: STARTER_STATIONS.map((s, i) => ({ ...s, businessId: business.id, sortOrder: i })),
     });

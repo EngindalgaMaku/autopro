@@ -8,6 +8,7 @@ import { segmentPrice } from "@/lib/money";
 import { parseDetails } from "@/lib/service-kinds";
 import { isValidPhone, normalizePhone } from "@/lib/phone";
 import { isValidPlate, normalizePlate } from "@/lib/plate";
+import { planOf, RESTRICTED_ORDERS_PER_30_DAYS } from "@/lib/plan";
 import { requireUser } from "@/lib/session";
 
 export interface VehicleMatch {
@@ -112,6 +113,14 @@ export async function createWorkOrder(
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const d = parsed.data;
   const businessId = user.businessId;
+
+  if (planOf(user.business).level === "RESTRICTED") {
+    const since = new Date(Date.now() - 30 * 24 * 3600 * 1000);
+    const used = await prisma.workOrder.count({ where: { businessId, createdAt: { gte: since } } });
+    if (used >= RESTRICTED_ORDERS_PER_30_DAYS) {
+      return { error: `Kısıtlı modda 30 günde en fazla ${RESTRICTED_ORDERS_PER_30_DAYS} kabul açılabilir. Tam kullanım için bize yazın.` };
+    }
+  }
   const plate = normalizePlate(d.plate);
   const phone = normalizePhone(d.customerPhone);
 
