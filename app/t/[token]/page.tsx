@@ -116,7 +116,7 @@ export default async function TrackingPage({ params }: { params: Promise<{ token
             </div>
             <Link
               href={`/t/${token}/sertifika`}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-3 py-1.5 text-xs font-semibold text-accent-ink transition hover:bg-accent-hover"
+              className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl bg-accent px-3 py-1.5 text-xs font-semibold text-accent-ink transition hover:bg-accent-hover"
             >
               <Award className="h-3.5 w-3.5" />
               Belgeyi Aç

@@ -357,7 +357,7 @@ export function ServicesEditor({
         {canEdit && (
           <div className="flex items-center gap-2">
             {activeTab === "services" && open !== "new" && (
-              <Button onClick={() => setOpen("new")} className="gap-2">
+              <Button onClick={() => setOpen("new")} className="shrink-0 whitespace-nowrap gap-2">
                 <Plus className="h-4 w-4" />
                 Yeni Hizmet Ekle
               </Button>
@@ -430,7 +430,7 @@ export function ServicesEditor({
             setOpen(null);
           }}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg py-2.5 transition-colors text-xs sm:text-sm",
+            "flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg py-2.5 transition-colors text-xs sm:text-sm",
             activeTab === "services" ? "bg-accent font-semibold text-accent-ink shadow-sm" : "text-muted hover:text-ink"
           )}
         >
@@ -456,7 +456,7 @@ export function ServicesEditor({
             setOpen(null);
           }}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg py-2.5 transition-colors text-xs sm:text-sm",
+            "flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg py-2.5 transition-colors text-xs sm:text-sm",
             activeTab === "packages" ? "bg-accent font-semibold text-accent-ink shadow-sm" : "text-muted hover:text-ink"
           )}
         >
@@ -482,7 +482,7 @@ export function ServicesEditor({
             setOpen(null);
           }}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg py-2.5 transition-colors text-xs sm:text-sm",
+            "flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg py-2.5 transition-colors text-xs sm:text-sm",
             activeTab === "multipliers" ? "bg-accent font-semibold text-accent-ink shadow-sm" : "text-muted hover:text-ink"
           )}
         >
@@ -533,7 +533,7 @@ export function ServicesEditor({
                 type="button"
                 onClick={() => setSelectedKind("ALL")}
                 className={cn(
-                  "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+                  "min-h-10 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                   selectedKind === "ALL"
                     ? "bg-accent font-semibold text-accent-ink"
                     : "bg-surface border border-line text-muted hover:text-ink hover:bg-raised"
@@ -553,7 +553,7 @@ export function ServicesEditor({
                     type="button"
                     onClick={() => setSelectedKind(k)}
                     className={cn(
-                      "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5",
+                      "min-h-10 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5",
                       isSelected
                         ? "bg-accent font-semibold text-accent-ink"
                         : "bg-surface border border-line text-muted hover:text-ink hover:bg-raised"
@@ -691,7 +691,7 @@ export function ServicesEditor({
                               s.isActive ? "Hizmet gizlendi" : "Hizmet listede gösteriliyor"
                             )
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:text-ink hover:bg-raised transition-colors"
+                          className="flex h-11 w-11 lg:h-8 lg:w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:text-ink hover:bg-raised transition-colors"
                         >
                           {s.isActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 text-muted/60" />}
                         </button>
@@ -702,7 +702,7 @@ export function ServicesEditor({
                             title="Hizmeti Düzenle"
                             aria-label="Düzenle"
                             onClick={() => setOpen(s.id)}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:border-accent/40 hover:bg-raised hover:text-ink transition-colors"
+                            className="flex h-11 w-11 lg:h-8 lg:w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:border-accent/40 hover:bg-raised hover:text-ink transition-colors"
                           >
                             <Edit3 className="h-3.5 w-3.5" />
                           </button>
@@ -717,7 +717,7 @@ export function ServicesEditor({
                                 run(() => deleteService(s.id), "Hizmet silindi", () => setOpen(null));
                               }
                             }}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:border-danger/40 hover:text-danger hover:bg-danger/10 transition-colors"
+                            className="flex h-11 w-11 lg:h-8 lg:w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:border-danger/40 hover:text-danger hover:bg-danger/10 transition-colors"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>

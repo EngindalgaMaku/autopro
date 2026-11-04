@@ -347,7 +347,7 @@ export function WorkOrderView({
                       <button
                         type="button"
                         aria-label="Tahsilatı sil"
-                        className="flex h-10 w-10 items-center justify-center rounded-lg text-muted hover:bg-raised"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-raised"
                         onClick={() => window.confirm("Bu tahsilat silinsin mi?") && run(() => deletePayment(order.id, p.id), "Tahsilat silindi")}
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />

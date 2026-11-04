@@ -86,7 +86,7 @@ export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
       <div className="no-print mx-auto mb-6 flex max-w-4xl items-center justify-between rounded-xl border border-line bg-surface p-4 text-ink shadow-lg">
         <Link
           href={`/is/${order.id}`}
-          className="inline-flex items-center gap-2 text-sm text-muted transition hover:text-ink"
+          className="inline-flex min-h-11 items-center gap-2 text-sm text-muted transition hover:text-ink"
         >
           <ArrowLeft className="h-4 w-4" />
           İş Emrine Dön
@@ -101,13 +101,13 @@ export function PrintWorkOrderView({ data }: { data: PrintWorkOrderData }) {
             className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 font-semibold text-accent-ink transition hover:bg-accent-hover"
           >
             <Printer className="h-4 w-4" />
-            Yazdır (Ctrl + P)
+            Yazdır
           </button>
         </div>
       </div>
 
       {/* The Printable A4 Document Sheet */}
-      <div className="mx-auto max-w-[210mm] border border-slate-300 bg-white p-6 text-slate-900 shadow-xl print:m-0 print:max-w-none print:border-none print:p-0 print:shadow-none">
+      <div className="mx-auto max-w-[210mm] overflow-x-auto border border-slate-300 bg-white p-3 text-slate-900 sm:p-6 print:overflow-visible print:p-0 shadow-xl print:m-0 print:max-w-none print:border-none print:p-0 print:shadow-none">
         {/* Header */}
         <div className="flex items-start justify-between border-b-2 border-slate-900 pb-4">
           <div>

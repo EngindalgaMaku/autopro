@@ -72,7 +72,7 @@ export function CertificateView({ data }: { data: CertificateData }) {
       <div className="no-print mx-auto mb-6 flex max-w-3xl flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4 shadow-xl">
         <Link
           href={`/t/${data.trackingToken}`}
-          className="inline-flex items-center gap-2 text-sm text-muted hover:text-ink"
+          className="inline-flex min-h-11 items-center gap-2 text-sm text-muted hover:text-ink"
         >
           <ArrowLeft className="h-4 w-4" />
           Takip Sayfasına Dön
@@ -81,7 +81,7 @@ export function CertificateView({ data }: { data: CertificateData }) {
           <button
             type="button"
             onClick={handleCopyLink}
-            className="inline-flex items-center gap-2 rounded-xl border border-line bg-raised px-3.5 py-2 text-xs font-semibold text-ink transition hover:bg-surface"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-raised px-3.5 py-2 text-xs font-semibold text-ink transition hover:bg-surface"
           >
             <Copy className="h-3.5 w-3.5 text-accent-strong" />
             Bağlantıyı Kopyala
@@ -89,7 +89,7 @@ export function CertificateView({ data }: { data: CertificateData }) {
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-ink transition hover:bg-accent-hover"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-ink transition hover:bg-accent-hover"
           >
             <Printer className="h-4 w-4" />
             Yazdır / PDF

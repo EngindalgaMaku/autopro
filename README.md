@@ -44,4 +44,4 @@ Uygulama canlı siteyi açar (`https://autopro.kodleon.com`); başka bir sunucu 
 
 ### Demo modu
 
-`AUTO_SEED=true` ile uygulama herkese açık demo olarak çalışır: demo atölyesi açılışta ve her gece 03.00'te yeniden kurulur, demo hesapta şifre, işletme bilgisi ve personel işlemleri kapanır, fotoğraf yüklemeye sınır gelir. Kendi kaydolan atölyelere dokunulmaz.
+`AUTO_SEED=true` ile uygulama herkese açık demo olarak çalışır: demo atölyesi açılışta ve her gece 03.00'te yeniden kurulur, demo hesapta şifre, işletme bilgisi ve personel işlemleri kapanır, fotoğraf yüklemeye sınır gelir. Kendi kaydolan atölyeler, bir hafta boyunca giriş yapılmaz ve iş açılmazsa silinir.

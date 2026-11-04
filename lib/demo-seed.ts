@@ -5,21 +5,23 @@ import bcrypt from "bcryptjs";
 import { SEGMENTS } from "./stages";
 import { newTrackingToken, newWorkOrderNumber } from "./ids";
 
-/** Removes the previous demo workshop with its uploaded photos */
+/** Removes a workshop, everything in it and its uploaded photos */
+export async function removeWorkshop(prisma: PrismaClient, id: string) {
+  // Everything that points at a customer first: the database refuses to remove a customer still in use
+  await prisma.workOrder.deleteMany({ where: { businessId: id } });
+  await prisma.appointment.deleteMany({ where: { businessId: id } });
+  await prisma.reminder.deleteMany({ where: { businessId: id } });
+  await prisma.vehicle.deleteMany({ where: { businessId: id } });
+  await prisma.business.delete({ where: { id } });
+  await rm(path.resolve(process.env.PHOTOS_DIR || "storage/photos", id), { recursive: true, force: true });
+}
+
 async function clearDemo(prisma: PrismaClient) {
   const demos = await prisma.business.findMany({
     where: { OR: [{ isDemo: true }, { users: { some: { email: "demo@autopro.com" } } }] },
     select: { id: true },
   });
-  for (const { id } of demos) {
-    // Everything that points at a customer first: the database refuses to remove a customer still in use
-    await prisma.workOrder.deleteMany({ where: { businessId: id } });
-    await prisma.appointment.deleteMany({ where: { businessId: id } });
-    await prisma.reminder.deleteMany({ where: { businessId: id } });
-    await prisma.vehicle.deleteMany({ where: { businessId: id } });
-    await prisma.business.delete({ where: { id } });
-    await rm(path.resolve(process.env.PHOTOS_DIR || "storage/photos", id), { recursive: true, force: true });
-  }
+  for (const { id } of demos) await removeWorkshop(prisma, id);
 }
 
 /** Replaces the shared demo workshop with fresh data dated around today */
@@ -665,16 +667,114 @@ export async function seedDemo(prisma: PrismaClient) {
     },
   });
 
+  // 8.5. TESLİM EDİLENLER: garanti belgesi, prim ve geçmiş ekranları boş kalmasın
+  const cElif = await prisma.customer.create({
+    data: { businessId: business.id, name: "Elif Şahin", phone: "05057778899", marketingConsent: true },
+  });
+  const vAudi = await prisma.vehicle.create({
+    data: {
+      businessId: business.id,
+      customerId: cElif.id,
+      plate: "34MNP345",
+      brand: "Audi",
+      model: "A5 Sportback",
+      year: 2024,
+      color: "Nardo Gri",
+      segment: VehicleSegment.SEDAN,
+    },
+  });
+  const deliveredToday = new Date(now.getTime() - 3 * 3600 * 1000);
+  const deliveredEarlier = new Date(now.getTime() - 9 * 24 * 3600 * 1000);
+  await prisma.workOrder.create({
+    data: {
+      businessId: business.id,
+      number: newWorkOrderNumber(),
+      trackingToken: newTrackingToken(),
+      customerId: cElif.id,
+      vehicleId: vAudi.id,
+      stage: WorkStage.DELIVERED,
+      stationId: stations[3].id,
+      technicianId: tech1.id,
+      mileage: 8400,
+      totalAmount: 16000,
+      createdById: owner.id,
+      createdAt: new Date(deliveredToday.getTime() - 26 * 3600 * 1000),
+      deliveredAt: deliveredToday,
+      items: {
+        create: [
+          {
+            serviceId: sSeramik.id,
+            name: sSeramik.name,
+            basePrice: 16000,
+            totalPrice: 16000,
+            kind: ServiceKind.CERAMIC,
+            technicianId: tech1.id,
+            details: { product: "Gtechniq Crystal Serum Light", layers: 2, warrantyMonths: 36 },
+          },
+        ],
+      },
+      events: {
+        create: [
+          { stage: WorkStage.RECEIVED, note: "Araç kabul edildi.", userId: owner.id },
+          { stage: WorkStage.DETAILING, note: "Seramik uygulandı.", userId: tech1.id },
+          { stage: WorkStage.DELIVERED, note: "Müşteriye teslim edildi.", userId: owner.id },
+        ],
+      },
+      payments: {
+        create: [{ amount: 16000, method: PaymentMethod.CARD, paidAt: deliveredToday, createdById: owner.id }],
+      },
+    },
+  });
+  await prisma.workOrder.create({
+    data: {
+      businessId: business.id,
+      number: newWorkOrderNumber(),
+      trackingToken: newTrackingToken(),
+      customerId: cElif.id,
+      vehicleId: vAudi.id,
+      stage: WorkStage.DELIVERED,
+      stationId: stations[4].id,
+      technicianId: tech2.id,
+      mileage: 8100,
+      totalAmount: 7000,
+      createdById: owner.id,
+      createdAt: new Date(deliveredEarlier.getTime() - 5 * 3600 * 1000),
+      deliveredAt: deliveredEarlier,
+      items: {
+        create: [
+          {
+            serviceId: sCamFilmi.id,
+            name: sCamFilmi.name,
+            basePrice: 7000,
+            totalPrice: 7000,
+            kind: ServiceKind.WINDOW_FILM,
+            technicianId: tech2.id,
+            details: { product: "LLumar ATR Serisi", tint: 35, windows: ["Arka yan camlar", "Arka cam"], warrantyMonths: 60 },
+          },
+        ],
+      },
+      events: {
+        create: [
+          { stage: WorkStage.RECEIVED, note: "Araç kabul edildi.", userId: owner.id },
+          { stage: WorkStage.DELIVERED, note: "Müşteriye teslim edildi.", userId: owner.id },
+        ],
+      },
+      payments: {
+        create: [{ amount: 7000, method: PaymentMethod.CASH, paidAt: deliveredEarlier, createdById: owner.id }],
+      },
+    },
+  });
+
   // 9. Randevular (Bugün için)
   const today14 = new Date(now);
-  today14.setHours(14, 0, 0, 0);
+  today14.setUTCHours(11, 0, 0, 0);
   const today1530 = new Date(now);
-  today1530.setHours(15, 30, 0, 0);
+  today1530.setUTCHours(12, 30, 0, 0);
 
   const today17 = new Date(now);
-  today17.setHours(17, 0, 0, 0);
+  today17.setUTCHours(14, 0, 0, 0);
   const today18 = new Date(now);
-  today18.setHours(18, 0, 0, 0);
+  today18.setUTCHours(15, 0, 0, 0);
 
   await prisma.appointment.create({
     data: {

@@ -29,13 +29,13 @@ export default function SignUpPage() {
           <Input name="password" type="password" required minLength={8} autoComplete="new-password" />
         </Field>
         <label className="flex items-start gap-3 text-sm text-muted">
-          <input type="checkbox" name="terms" className="mt-0.5 h-5 w-5 accent-[#ffb020]" defaultChecked={f.terms === "on"} />
+          <input type="checkbox" name="terms" className="mt-0.5 h-5 w-5 shrink-0 accent-[#ffb020]" defaultChecked={f.terms === "on"} />
           <span>
             <Link href="/kullanim-sartlari" className="text-accent-strong">Kullanım şartlarını</Link> ve{" "}
             <Link href="/kvkk" className="text-accent-strong">KVKK aydınlatma metnini</Link> okudum, onaylıyorum.
           </span>
         </label>
-        <p className="text-sm text-muted">Bu bir tanıtım sürümüdür. Gerçek müşteri bilgisi girmeyin.</p>
+        <p className="text-sm text-muted">Bu bir tanıtım sürümüdür. Gerçek müşteri bilgisi girmeyin. Bir hafta kullanılmayan hesaplar silinir.</p>
         {state.error && (
           <p role="alert" className="rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">
             {state.error}

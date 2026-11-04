@@ -227,7 +227,7 @@ export function PersonelClient({
             key={tab.key}
             type="button"
             onClick={() => setFilterRole(tab.key)}
-            className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition ${
+            className={`min-h-10 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition ${
               filterRole === tab.key
                 ? "bg-accent text-accent-ink shadow-sm"
                 : "border border-line bg-surface text-muted hover:text-ink hover:bg-raised"
@@ -242,7 +242,7 @@ export function PersonelClient({
       <div className="space-y-3">
         {/* Desktop Column Header */}
         {filteredStaff.length > 0 && (
-          <div className="hidden lg:grid lg:grid-cols-[minmax(250px,1.2fr)_110px_130px_130px_150px_auto] items-center gap-4 px-6 py-2 text-[11px] font-semibold text-muted uppercase tracking-wider">
+          <div className="hidden xl:grid xl:grid-cols-[minmax(250px,1.2fr)_110px_130px_130px_150px_auto] items-center gap-4 px-6 py-2 text-[11px] font-semibold text-muted uppercase tracking-wider">
             <div>Personel Bilgisi</div>
             <div>Tamamlanan İş</div>
             <div>Üretilen Ciro</div>
@@ -264,9 +264,9 @@ export function PersonelClient({
 
             return (
               <Card key={staff.id} className="overflow-hidden border border-line bg-surface shadow-sm">
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[minmax(250px,1.2fr)_110px_130px_130px_150px_auto] items-center gap-4 p-5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-[minmax(250px,1.2fr)_110px_130px_130px_150px_auto] items-center gap-4 p-5">
                   {/* Col 1: Avatar & Info */}
-                  <div className="col-span-2 sm:col-span-4 lg:col-span-1 flex items-center gap-3.5 min-w-0">
+                  <div className="col-span-2 sm:col-span-4 xl:col-span-1 flex items-center gap-3.5 min-w-0">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-accent/25 bg-accent/10 font-display text-lg font-bold text-accent-strong shadow-sm">
                       {cleanStaffName.slice(0, 2).toUpperCase()}
                     </div>
@@ -299,7 +299,7 @@ export function PersonelClient({
 
                   {/* Col 2: Tamamlanan İş */}
                   <div className="col-span-1 min-w-0">
-                    <p className="text-[11px] font-medium text-muted lg:hidden">Tamamlanan İş</p>
+                    <p className="text-[11px] font-medium text-muted xl:hidden">Tamamlanan İş</p>
                     <p className="font-display text-lg font-bold text-ink whitespace-nowrap">
                       {staff.completedJobsCount} <span className="text-xs font-normal text-muted">araç</span>
                     </p>
@@ -307,7 +307,7 @@ export function PersonelClient({
 
                   {/* Col 3: Üretilen Ciro */}
                   <div className="col-span-1 min-w-0">
-                    <p className="text-[11px] font-medium text-muted lg:hidden">Üretilen Ciro</p>
+                    <p className="text-[11px] font-medium text-muted xl:hidden">Üretilen Ciro</p>
                     <p className="font-display text-lg font-bold text-ink whitespace-nowrap">
                       {formatTL(staff.totalRevenue)}
                     </p>
@@ -315,7 +315,7 @@ export function PersonelClient({
 
                   {/* Col 4: Prim Oranı */}
                   <div className="col-span-1 rounded-xl border border-line bg-raised/70 p-2 text-center w-full min-w-0">
-                    <p className="text-[10px] font-medium text-muted uppercase tracking-wider lg:hidden">Prim Oranı</p>
+                    <p className="text-[10px] font-medium text-muted uppercase tracking-wider xl:hidden">Prim Oranı</p>
                     {isEditingRate ? (
                       <div className="mt-1 flex items-center justify-center gap-1">
                         <input
@@ -349,7 +349,7 @@ export function PersonelClient({
                           setEditingRateId(staff.id);
                           setNewRateValue(String(staff.commissionRate));
                         }}
-                        className="mt-0.5 inline-flex items-center gap-1 font-mono text-sm font-bold text-accent-strong hover:underline"
+                        className="mt-0.5 inline-flex min-h-10 min-w-10 items-center justify-center gap-1 font-mono text-sm font-bold text-accent-strong hover:underline"
                         title="Prim oranını düzenle"
                       >
                         %{staff.commissionRate}
@@ -360,14 +360,14 @@ export function PersonelClient({
 
                   {/* Col 5: Hakediş Primi */}
                   <div className="col-span-1 rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-right w-full min-w-0">
-                    <p className="text-[10px] font-semibold text-accent-strong uppercase tracking-wider whitespace-nowrap lg:hidden">Hakediş Primi</p>
+                    <p className="text-[10px] font-semibold text-accent-strong uppercase tracking-wider whitespace-nowrap xl:hidden">Hakediş Primi</p>
                     <p className="font-display text-xl font-bold text-ink whitespace-nowrap">
                       {formatTL(staff.commissionPayout)}
                     </p>
                   </div>
 
                   {/* Col 6: Actions */}
-                  <div className="col-span-2 sm:col-span-4 lg:col-span-1 flex items-center justify-end gap-2 shrink-0">
+                  <div className="col-span-2 sm:col-span-4 xl:col-span-1 flex items-center justify-end gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => handleToggleStatus(staff.id, staff.isActive)}
@@ -381,7 +381,7 @@ export function PersonelClient({
                       }
                       aria-label={staff.isActive ? "Personeli Pasife Al" : "Personeli Aktifleştir"}
                       className={cn(
-                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition-colors",
+                        "flex h-11 w-11 lg:h-9 lg:w-9 shrink-0 items-center justify-center rounded-xl border transition-colors",
                         staff.isActive
                           ? "border-line bg-surface text-muted hover:border-danger/40 hover:bg-danger/10 hover:text-danger"
                           : "border-ready/40 bg-ready/10 text-ready hover:bg-ready/20",
@@ -394,7 +394,7 @@ export function PersonelClient({
                     <button
                       type="button"
                       onClick={() => setExpandedUser(isExpanded ? null : staff.id)}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-muted hover:border-accent/40 hover:bg-raised hover:text-ink transition-colors"
+                      className="flex h-11 w-11 lg:h-9 lg:w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-muted hover:border-accent/40 hover:bg-raised hover:text-ink transition-colors"
                       title={isExpanded ? "İşlem geçmişini gizle" : "İşlem geçmişini göster"}
                       aria-label={isExpanded ? "Gizle" : "İşlem detaylarını göster"}
                     >

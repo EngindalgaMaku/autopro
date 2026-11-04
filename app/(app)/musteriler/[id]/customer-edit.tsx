@@ -37,7 +37,7 @@ export function CustomerEdit(props: { id: string; name: string; phone: string; n
         />
       </Field>
       <label className="flex items-start gap-3 text-sm">
-        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-5 w-5 accent-[#ffb020]" />
+        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#ffb020]" />
         <span>
           Kampanya mesajı almayı kabul etti
           <span className="block text-muted">Onayın ne zaman ve nasıl alındığını kayıt altında tutun.</span>

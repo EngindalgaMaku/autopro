@@ -77,13 +77,13 @@ export default async function WorkshopPage({
         <div className="flex items-center gap-2 border-b border-line pb-3">
           <Link
             href="/atolye"
-            className="rounded-xl border border-line bg-surface px-4 py-2 text-xs font-semibold text-muted transition hover:bg-raised hover:text-ink"
+            className="inline-flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 py-2 text-xs font-semibold text-muted transition hover:bg-raised hover:text-ink"
           >
             Aktif Atölye Panosu ({liveOrdersCount})
           </Link>
           <Link
             href="/atolye?gorunum=arsiv"
-            className="rounded-xl bg-accent px-4 py-2 text-xs font-bold text-accent-ink shadow-sm"
+            className="inline-flex min-h-11 items-center rounded-xl bg-accent px-4 py-2 text-xs font-bold text-accent-ink shadow-sm"
           >
             Tamamlanan & Arşiv ({archiveOrdersCount})
           </Link>
@@ -328,13 +328,13 @@ export default async function WorkshopPage({
       <div className="flex items-center gap-2 border-b border-line pb-3">
         <Link
           href="/atolye"
-          className="rounded-xl bg-accent px-4 py-2 text-xs font-bold text-accent-ink shadow-sm"
+          className="inline-flex min-h-11 items-center rounded-xl bg-accent px-4 py-2 text-xs font-bold text-accent-ink shadow-sm"
         >
           Aktif Atölye Panosu ({orders.length})
         </Link>
         <Link
           href="/atolye?gorunum=arsiv"
-          className="rounded-xl border border-line bg-surface px-4 py-2 text-xs font-semibold text-muted transition hover:bg-raised hover:text-ink"
+          className="inline-flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 py-2 text-xs font-semibold text-muted transition hover:bg-raised hover:text-ink"
         >
           Tamamlanan & Arşiv ({archiveOrdersCount})
         </Link>

@@ -181,10 +181,13 @@ export default async function TodayPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-3">
           <QuickActionsRibbon />
-          <ThemeToggle />
-          <form action={signOut}>
+          {/* On a phone these two already sit in the top bar and the menu */}
+          <span className="hidden lg:contents">
+            <ThemeToggle />
+          </span>
+          <form action={signOut} className="hidden lg:block">
             <button
               type="submit"
               aria-label="Çıkış yap"
@@ -328,7 +331,7 @@ export default async function TodayPage() {
             <Eyebrow>Bugünkü Randevu Akışı</Eyebrow>
             <Link
               href="/randevular"
-              className="text-xs font-semibold text-accent-strong hover:underline"
+              className="inline-flex h-11 items-center text-xs font-semibold text-accent-strong hover:underline"
             >
               Takvimi Aç &rarr;
             </Link>

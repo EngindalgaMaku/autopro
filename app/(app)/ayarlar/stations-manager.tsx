@@ -197,7 +197,7 @@ export function StationsManager({
                     title="İstasyonu Düzenle"
                     aria-label="Düzenle"
                     onClick={() => setEditingId(s.id)}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:border-accent/40 hover:bg-raised hover:text-ink transition-colors"
+                    className="flex h-11 w-11 lg:h-8 lg:w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:border-accent/40 hover:bg-raised hover:text-ink transition-colors"
                   >
                     <Edit3 className="h-3.5 w-3.5" />
                   </button>
@@ -208,7 +208,7 @@ export function StationsManager({
                     aria-label="Sil"
                     disabled={isPending}
                     onClick={() => handleDelete(s.id, s.name)}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:border-danger/40 hover:text-danger hover:bg-danger/10 transition-colors"
+                    className="flex h-11 w-11 lg:h-8 lg:w-8 items-center justify-center rounded-lg border border-line bg-surface text-muted hover:border-danger/40 hover:text-danger hover:bg-danger/10 transition-colors"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>

@@ -112,8 +112,8 @@ export function Sidebar({ user }: { user: SidebarUser }) {
   return (
     <>
       {/* Mobil Üst Bar */}
-      <header className="no-print fixed inset-x-0 top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between border-b border-line bg-sunken/95 px-4 backdrop-blur md:hidden pt-[env(safe-area-inset-top)]">
-        <Link href="/bugun" className="flex items-center gap-2">
+      <header className="no-print fixed inset-x-0 top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between border-b border-line bg-sunken/95 px-4 backdrop-blur lg:hidden pt-[env(safe-area-inset-top)]">
+        <Link href="/bugun" className="flex min-h-11 items-center gap-2">
           <BrandMark withName={true} />
         </Link>
         <div className="flex items-center gap-1.5">
@@ -139,7 +139,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
 
       {/* Mobil Slide-over Menü (Çekmece) */}
       {mobileMenuOpen && (
-        <div role="dialog" aria-modal="true" aria-label="Menü" className="fixed inset-0 z-50 md:hidden">
+        <div role="dialog" aria-modal="true" aria-label="Menü" className="fixed inset-0 z-50 lg:hidden">
           {/* Karartma Katmanı */}
           <div
             className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
@@ -155,7 +155,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label="Menüyü kapat"
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-raised hover:text-ink"
+                className="flex h-11 w-11 items-center justify-center rounded-lg text-muted hover:bg-raised hover:text-ink"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -233,7 +233,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
       {/* Mobil Alt Menü */}
       <nav
         aria-label="Mobil ana menü"
-        className="no-print hide-on-keyboard fixed inset-x-0 bottom-0 z-40 grid h-[calc(72px+env(safe-area-inset-bottom))] grid-cols-5 items-center border-t border-line bg-sunken pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="no-print hide-on-keyboard fixed inset-x-0 bottom-0 z-40 grid h-[calc(72px+env(safe-area-inset-bottom))] grid-cols-5 items-center border-t border-line bg-sunken pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
         {MOBILE_ITEMS.map(({ href, label, icon: Icon, ...rest }) => {
           const active = isActive(pathname, href);
@@ -270,7 +270,7 @@ export function Sidebar({ user }: { user: SidebarUser }) {
       <aside
         aria-label="Sol menü"
         className={cn(
-          "no-print sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-sunken transition-[width] duration-200 ease-in-out md:flex",
+          "no-print sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-sunken transition-[width] duration-200 ease-in-out lg:flex",
           collapsed ? "w-20 p-3" : "w-64 p-4"
         )}
       >

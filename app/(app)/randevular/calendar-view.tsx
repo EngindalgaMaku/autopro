@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -78,6 +78,11 @@ export function CalendarView({
 }) {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<"timeline" | "list">("timeline");
+  const timelineColumns = `64px repeat(${stations.length + 1}, minmax(130px, 1fr))`;
+  // On a phone the list reads better than a chart wider than the screen
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 639px)").matches) setViewMode("list");
+  }, []);
   const [modalOpen, setModalOpen] = useState(false);
   useEscape(modalOpen, () => setModalOpen(false));
   const [editingApp, setEditingApp] = useState<CalendarAppointment | null>(null);
@@ -184,7 +189,7 @@ export function CalendarView({
               type="button"
               onClick={() => setViewMode("timeline")}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors",
+                "flex min-h-10 items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors",
                 viewMode === "timeline" ? "bg-accent text-accent-ink" : "text-muted hover:text-ink"
               )}
             >
@@ -195,7 +200,7 @@ export function CalendarView({
               type="button"
               onClick={() => setViewMode("list")}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors",
+                "flex min-h-10 items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors",
                 viewMode === "list" ? "bg-accent text-accent-ink" : "text-muted hover:text-ink"
               )}
             >
@@ -213,19 +218,19 @@ export function CalendarView({
 
       {/* Tarih Gezgini */}
       <Card className="flex flex-wrap items-center justify-between gap-3 p-3 sm:px-4">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => shiftDate(-1)}
             aria-label="Önceki gün"
-            className="rounded-lg p-2 text-muted hover:bg-raised hover:text-ink transition-colors border border-line"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-muted hover:bg-raised hover:text-ink transition-colors border border-line"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => changeDate(new Date().toISOString().slice(0, 10))}
-            className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-raised border border-line text-ink hover:border-line-strong transition-colors"
+            className="h-11 rounded-lg px-3 text-xs font-semibold bg-raised border border-line text-ink hover:border-line-strong transition-colors"
           >
             Bugün
           </button>
@@ -233,7 +238,7 @@ export function CalendarView({
             type="button"
             onClick={() => shiftDate(1)}
             aria-label="Sonraki gün"
-            className="rounded-lg p-2 text-muted hover:bg-raised hover:text-ink transition-colors border border-line"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-muted hover:bg-raised hover:text-ink transition-colors border border-line"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -246,7 +251,7 @@ export function CalendarView({
             type="date"
             value={dateKey}
             onChange={(e) => e.target.value && changeDate(e.target.value)}
-            className="h-9 rounded-lg border border-line bg-sunken px-2.5 text-xs text-ink focus:border-accent focus:outline-none"
+            className="h-11 rounded-lg border border-line bg-sunken px-2.5 text-xs text-ink focus:border-accent focus:outline-none"
           />
           <span className="rounded-lg bg-raised px-2.5 py-1 text-xs font-medium text-muted border border-line">
             {appointments.length} Randevu
@@ -260,9 +265,9 @@ export function CalendarView({
       {viewMode === "timeline" && (
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
-            <div className="min-w-[850px]">
+            <div style={{ minWidth: 64 + (stations.length + 1) * 130 }}>
               {/* İstasyon Sütun Başlıkları */}
-              <div className="grid grid-cols-[80px_repeat(auto-fit,minmax(140px,1fr))] border-b border-line bg-raised/50 sticky top-0 z-10 text-xs font-semibold">
+              <div style={{ gridTemplateColumns: timelineColumns }} className="grid border-b border-line bg-raised/50 sticky top-0 z-10 text-xs font-semibold">
                 <div className="p-3 text-muted text-center border-r border-line">Saat</div>
                 {stations.map((st) => (
                   <div key={st.id} className="p-3 border-r border-line text-ink flex items-center justify-between">
@@ -271,7 +276,8 @@ export function CalendarView({
                       type="button"
                       title={`${st.name} için randevu ekle`}
                       onClick={() => openNewModal(st.id)}
-                      className="text-muted hover:text-accent-strong p-0.5 rounded"
+                      aria-label={`${st.name} için randevu ekle`}
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded text-muted hover:text-accent-strong"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -287,7 +293,8 @@ export function CalendarView({
                   return (
                     <div
                       key={hour}
-                      className="grid grid-cols-[80px_repeat(auto-fit,minmax(140px,1fr))] min-h-[72px] hover:bg-raised/20 transition-colors"
+                      style={{ gridTemplateColumns: timelineColumns }}
+                      className="grid min-h-[72px] hover:bg-raised/20 transition-colors"
                     >
                       {/* Saat Etiketi */}
                       <div className="p-2 border-r border-line/60 text-xs font-mono text-muted text-center flex items-center justify-center">
@@ -487,7 +494,7 @@ export function CalendarView({
                         <div className="flex items-center gap-1.5">
                           <Link
                             href={`/kabul?plaka=${app.plate ?? ""}`}
-                            className="rounded-lg bg-ready/15 text-ready border border-ready/30 px-2.5 py-1 font-semibold hover:bg-ready/25 transition-colors inline-flex items-center gap-1 text-xs"
+                            className="min-h-10 rounded-lg bg-ready/15 text-ready border border-ready/30 px-2.5 py-1 font-semibold hover:bg-ready/25 transition-colors inline-flex items-center gap-1 text-xs"
                           >
                             <UserCheck className="h-3.5 w-3.5" />
                             Araç Geldi (Kabul Aç)
@@ -502,14 +509,14 @@ export function CalendarView({
                           variant="secondary"
                           size="sm"
                           onClick={() => openEditModal(app)}
-                          className="h-7 px-2 text-xs"
+                          className="h-10 lg:h-7 px-2 text-xs"
                         >
                           Düzenle
                         </Button>
                         <button
                           type="button"
                           onClick={() => handleDelete(app.id)}
-                          className="p-1 text-muted hover:text-danger rounded hover:bg-danger/10"
+                          className="grid h-10 w-10 place-items-center text-muted hover:text-danger rounded hover:bg-danger/10"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
